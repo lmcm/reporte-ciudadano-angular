@@ -1,0 +1,43 @@
+/* Estilos globales */
+:root {
+  --primary-color: #0c7ff2;
+  --primary-hover-color: #0a68c4;
+  --secondary-color: #e7edf4;
+  --text-primary: #0d141c;
+  --text-secondary: #49739c;
+  --border-color: #cedbe8;
+  --background-color: #f8fafc;
+}
+
+body {
+  font-family: 'Public Sans', sans-serif;
+  margin: 0;
+  padding: 0;
+}
+
+.btn-primary {
+  background-color: var(--primary-color);
+  color: white;
+  padding: 0.75rem 1.5rem;
+  border-radius: 0.375rem;
+  font-weight: 600;
+  transition: background-color 0.2s;
+}
+
+.btn-primary:hover {
+  background-color: var(--primary-hover-color);
+}
+
+.form-input {
+  border: 1px solid var(--border-color);
+  border-radius: 0.375rem;
+  padding: 0.75rem;
+  width: 100%;
+  transition: border-color 0.2s;
+}
+
+.form-input:focus {
+  outline: none;
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 3px rgba(12, 127, 242, 0.1);
+}

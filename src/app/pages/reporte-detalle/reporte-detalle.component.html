@@ -1,0 +1,174 @@
+<div class="flex flex-col min-h-screen bg-slate-50">
+  <header class="bg-white shadow-sm">
+    <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex items-center justify-between h-16">
+        <div class="flex items-center gap-4">
+          <svg class="h-8 w-8 text-blue-600" fill="none" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
+            <path d="M4 4H17.3334V17.3334H30.6666V30.6666H44V44H4V4Z" fill="currentColor"></path>
+          </svg>
+          <h1 class="text-xl font-bold">CityConnect Boca del Río</h1>
+        </div>
+        <nav class="hidden md:flex items-center gap-8">
+          <a class="text-sm font-medium text-gray-600 hover:text-blue-600" href="#">Panel</a>
+          <a routerLink="/admin-panel" class="text-sm font-medium text-blue-600 border-b-2 border-blue-600 pb-1">Reportes</a>
+          <a class="text-sm font-medium text-gray-600 hover:text-blue-600" href="#">Usuarios</a>
+        </nav>
+        <div class="flex items-center gap-4">
+          <button class="relative">
+            <svg class="w-6 h-6 text-gray-600" fill="currentColor" viewBox="0 0 256 256" xmlns="http://www.w3.org/2000/svg">
+              <path d="M221.8,175.94C216.25,166.38,208,139.33,208,104a80,80,0,1,0-160,0c0,35.34-8.26,62.38-13.81,71.94A16,16,0,0,0,48,200H88.81a40,40,0,0,0,78.38,0H208a16,16,0,0,0,13.8-24.06ZM128,216a24,24,0,0,1-22.62-16h45.24A24,24,0,0,1,128,216ZM48,184c7.7-13.24,16-43.92,16-80a64,64,0,1,1,128,0c0,36.05,8.28,66.73,16,80Z"></path>
+            </svg>
+            <span class="absolute -top-1 -right-1 flex h-3 w-3">
+              <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+              <span class="relative inline-flex rounded-full h-3 w-3 bg-red-500"></span>
+            </span>
+          </button>
+          <div class="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-10" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuBvh128m3DzLuKW4KCOM62eraXokcfuAyF6uulYQGryNaAo5u4y-x9OypSGClwOMEVLGfgDI-T0WLEhZxZhU9ZE_AcWyaiYM64L6K60Q-FbsdGvu6ANblwwLnX74wHsoEH3jKme7EKfYKQU9GEVxPrwcI-WDPa_SM5B4jNXavYgpoRXUuPSPNrA3AwbyZcjZjVCAgLUYg-T48-rwM9mqlrz4fUthbsf48LcA7N7I_2CtChqSGREXmUPjAbWoowJTvwa5t3_PcfTDcD8");'></div>
+        </div>
+      </div>
+    </div>
+  </header>
+  
+  <main class="flex-grow container mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div class="max-w-4xl mx-auto">
+      <div class="mb-6">
+        <nav aria-label="Breadcrumb" class="flex">
+          <ol class="inline-flex items-center space-x-1 md:space-x-2 rtl:space-x-reverse">
+            <li class="inline-flex items-center">
+              <a routerLink="/admin-panel" class="inline-flex items-center text-sm font-medium text-slate-600 hover:text-blue-600">
+                <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M2 6a2 2 0 012-2h5l2 2h5a2 2 0 012 2v6a2 2 0 01-2 2H4a2 2 0 01-2-2V6z"></path>
+                </svg>
+                Reportes
+              </a>
+            </li>
+            <li>
+              <div class="flex items-center">
+                <svg class="w-4 h-4 text-gray-400" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                  <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path>
+                </svg>
+                <span class="ms-1 text-sm font-medium text-slate-900 md:ms-2">Detalles del Reporte</span>
+              </div>
+            </li>
+          </ol>
+        </nav>
+      </div>
+      
+      <div class="bg-white rounded-lg shadow-md p-6 md:p-8">
+        <div class="mb-8">
+          <h2 class="text-3xl font-bold tracking-tight">Reporte #{{ reporteId }}</h2>
+          <p class="text-slate-600 mt-1">Vea y gestione los detalles de esta solicitud de servicio.</p>
+        </div>
+        
+        <form (ngSubmit)="guardarCambios()" class="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
+          <div>
+            <label class="block text-sm font-medium text-slate-900 pb-1.5" for="report-id">ID de Reporte</label>
+            <input class="form-input w-full rounded-md border-slate-300 bg-gray-50 text-slate-900 focus:ring-blue-600 focus:border-blue-600" disabled id="report-id" type="text" [value]="reporteId" />
+          </div>
+          
+          <div>
+            <label class="block text-sm font-medium text-slate-900 pb-1.5" for="report-date">Fecha del Reporte</label>
+            <input class="form-input w-full rounded-md border-slate-300 bg-gray-50 text-slate-900 focus:ring-blue-600 focus:border-blue-600" disabled id="report-date" type="text" [value]="reporte.fecha" />
+          </div>
+          
+          <div>
+            <label class="block text-sm font-medium text-slate-900 pb-1.5" for="report-type">Tipo de Reporte</label>
+            <input class="form-input w-full rounded-md border-slate-300 bg-gray-50 text-slate-900 focus:ring-blue-600 focus:border-blue-600" disabled id="report-type" type="text" [value]="reporte.tipo" />
+          </div>
+          
+          <div>
+            <label class="block text-sm font-medium text-slate-900 pb-1.5" for="location">Ubicación</label>
+            <input class="form-input w-full rounded-md border-slate-300 bg-gray-50 text-slate-900 focus:ring-blue-600 focus:border-blue-600" disabled id="location" type="text" [value]="reporte.ubicacion" />
+          </div>
+          
+          <div class="md:col-span-2">
+            <label class="block text-sm font-medium text-slate-900 pb-1.5" for="description">Descripción</label>
+            <textarea class="form-textarea w-full rounded-md border-slate-300 bg-gray-50 text-slate-900 focus:ring-blue-600 focus:border-blue-600" disabled id="description" rows="4">{{ reporte.descripcion }}</textarea>
+          </div>
+          
+          <hr class="md:col-span-2 my-2" />
+          
+          <div>
+            <label class="block text-sm font-medium text-slate-900 pb-1.5" for="status">Estado</label>
+            <select [(ngModel)]="reporte.estado" name="estado" class="form-select w-full rounded-md border-slate-300 text-slate-900 focus:ring-blue-600 focus:border-blue-600" id="status">
+              <option value="Recibido">Recibido</option>
+              <option value="En Progreso">En Progreso</option>
+              <option value="Completado">Completado</option>
+              <option value="Cancelado">Cancelado</option>
+            </select>
+          </div>
+          
+          <div>
+            <label class="block text-sm font-medium text-slate-900 pb-1.5" for="assigned-personnel">Personal Asignado</label>
+            <select [(ngModel)]="reporte.personalAsignado" name="personalAsignado" class="form-select w-full rounded-md border-slate-300 text-slate-900 focus:ring-blue-600 focus:border-blue-600" id="assigned-personnel">
+              <option value="">Sin Asignar</option>
+              <option value="Equipo de Obras Públicas A">Equipo de Obras Públicas A</option>
+              <option value="Equipo de Obras Públicas B">Equipo de Obras Públicas B</option>
+              <option value="Servicios de Contratista">Servicios de Contratista</option>
+            </select>
+          </div>
+          
+          <div class="md:col-span-2 mt-8 flex justify-end">
+            <button class="inline-flex items-center justify-center rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:ring-offset-2" type="submit">
+              <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                <path d="M7.707 10.293a1 1 0 10-1.414 1.414l3 3a1 1 0 001.414 0l3-3a1 1 0 00-1.414-1.414L11 11.586V6h5a2 2 0 012 2v6a2 2 0 01-2 2H4a2 2 0 01-2-2V8a2 2 0 012-2h5v5.586l-1.293-1.293zM9 4a1 1 0 012 0v2H9V4z"></path>
+              </svg>
+              Guardar Cambios
+            </button>
+          </div>
+        </form>
+      </div>
+      
+      <div class="bg-white rounded-lg shadow-md p-6 md:p-8 mt-8">
+        <h3 class="text-xl font-bold tracking-tight mb-4">Historial de Actualizaciones</h3>
+        <div class="border-l-2 border-gray-200 ml-2">
+          <div *ngFor="let update of historial" class="relative pl-8 pb-8">
+            <div class="absolute left-[-9px] top-[5px] h-4 w-4 rounded-full bg-blue-500"></div>
+            <p class="font-semibold text-gray-800">{{ update.estado }}</p>
+            <p class="text-sm text-gray-500">{{ update.fecha }}</p>
+          </div>
+        </div>
+      </div>
+      
+      <div class="bg-white rounded-lg shadow-md p-6 md:p-8 mt-8">
+        <h3 class="text-xl font-bold tracking-tight mb-6">Comentarios</h3>
+        <div class="space-y-6">
+          <div *ngFor="let comentario of comentarios" class="flex gap-4">
+            <div class="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-10" [style.background-image]="'url(' + comentario.avatar + ')'"></div>
+            <div class="flex-1">
+              <div class="flex items-center justify-between">
+                <p class="font-semibold text-gray-900">{{ comentario.autor }}</p>
+                <p class="text-sm text-gray-500">{{ comentario.fecha }}</p>
+              </div>
+              <p class="text-gray-700 mt-1">{{ comentario.texto }}</p>
+            </div>
+          </div>
+        </div>
+        
+        <div class="mt-8">
+          <h4 class="text-lg font-semibold mb-3">Agregar un comentario</h4>
+          <div class="flex gap-4">
+            <div class="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-10" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuBvh128m3DzLuKW4KCOM62eraXokcfuAyF6uulYQGryNaAo5u4y-x9OypSGClwOMEVLGfgDI-T0WLEhZxZhU9ZE_AcWyaiYM64L6K60Q-FbsdGvu6ANblwwLnX74wHsoEH3jKme7EKfYKQU9GEVxPrwcI-WDPa_SM5B4jNXavYgpoRXUuPSPNrA3AwbyZcjZjVCAgLUYg-T48-rwM9mqlrz4fUthbsf48LcA7N7I_2CtChqSGREXmUPjAbWoowJTvwa5t3_PcfTDcD8");'></div>
+            <div class="flex-1">
+              <textarea [(ngModel)]="nuevoComentario" class="form-textarea w-full rounded-md border-slate-300 text-slate-900 focus:ring-blue-600 focus:border-blue-600" placeholder="Escribe tu comentario aquí..." rows="3"></textarea>
+              <div class="mt-3 flex justify-end">
+                <button (click)="enviarComentario()" class="inline-flex items-center justify-center rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:ring-offset-2" type="button">
+                  <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M10.894 2.553a1 1 0 00-1.788 0l-7 14a1 1 0 001.169 1.409l5-1.429A1 1 0 009 15.571V11a1 1 0 112 0v4.571a1 1 0 00.725.962l5 1.428a1 1 0 001.17-1.408l-7-14z"></path>
+                  </svg>
+                  Enviar Comentario
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+  
+  <footer class="bg-white">
+    <div class="container mx-auto px-4 sm:px-6 lg:px-8 py-4 text-center text-sm text-gray-500">
+      <p>© 2024 CityConnect - H. Ayuntamiento de Boca del Río, Veracruz. Todos los derechos reservados.</p>
+    </div>
+  </footer>
+</div>

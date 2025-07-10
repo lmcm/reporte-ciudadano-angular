@@ -1,0 +1,48 @@
+<div class="flex flex-col min-h-screen bg-slate-50">
+  <app-header></app-header>
+  
+  <main class="flex-grow container mx-auto px-6 py-12">
+    <div class="text-center mb-12">
+      <h2 class="text-4xl font-bold text-slate-900 tracking-tight">Servicios Realizados</h2>
+      <p class="mt-3 text-lg text-slate-600 max-w-2xl mx-auto">
+        Consulta los reportes de servicios que han sido atendidos gracias a la participación ciudadana en Boca del Río.
+      </p>
+    </div>
+    
+    <div class="space-y-8">
+      <div *ngFor="let servicio of servicios" class="bg-white rounded-lg shadow-md overflow-hidden transition-shadow hover:shadow-lg">
+        <div class="p-6">
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div class="md:col-span-1">
+              <h3 class="text-xl font-semibold text-slate-900 mb-2">{{ servicio.titulo }}</h3>
+              <div class="flex items-center text-slate-600 text-sm mb-2">
+                <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                  <path clip-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" fill-rule="evenodd"></path>
+                </svg>
+                <span>{{ servicio.ubicacion }}</span>
+              </div>
+              <div class="flex items-center text-slate-600 text-sm">
+                <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                  <path clip-rule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" fill-rule="evenodd"></path>
+                </svg>
+                <span>Completado: {{ servicio.fechaCompletado }}</span>
+              </div>
+            </div>
+            <div class="md:col-span-2 grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <img [alt]="servicio.titulo + ' antes'" class="w-full h-48 object-cover rounded-md border border-slate-300" [src]="servicio.imagenAntes" />
+                <p class="text-center text-sm font-medium text-slate-600 mt-2">Antes</p>
+              </div>
+              <div>
+                <img [alt]="servicio.titulo + ' después'" class="w-full h-48 object-cover rounded-md border-2 border-green-500" [src]="servicio.imagenDespues" />
+                <p class="text-center text-sm font-semibold text-green-700 mt-2">Después</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+  
+  <app-footer></app-footer>
+</div>

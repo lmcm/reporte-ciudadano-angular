@@ -1,0 +1,97 @@
+<div class="flex flex-col min-h-screen bg-slate-50">
+  <header class="bg-white shadow-sm">
+    <div class="container mx-auto px-6 py-4 flex justify-between items-center">
+      <div class="flex items-center gap-3">
+        <svg class="size-8 text-blue-600" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24">
+          <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+          <circle cx="12" cy="10" r="3"></circle>
+        </svg>
+        <h1 class="text-2xl font-bold text-slate-900">Boca del Río</h1>
+      </div>
+      <nav class="hidden md:flex items-center gap-6">
+        <a routerLink="/inicio" class="text-slate-600 text-base font-medium leading-normal hover:text-blue-600 transition-colors">Inicio</a>
+        <a routerLink="/nuevo-reporte" class="text-slate-600 text-base font-medium leading-normal hover:text-blue-600 transition-colors">Reportar</a>
+        <a routerLink="/consulta-reporte" class="text-slate-600 text-base font-medium leading-normal hover:text-blue-600 transition-colors">Consultar</a>
+        <a href="#" class="text-slate-600 text-base font-medium leading-normal hover:text-blue-600 transition-colors">Contacto</a>
+      </nav>
+      <div class="flex items-center gap-4">
+        <button class="text-gray-500 hover:text-blue-600 focus:outline-none">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+          </svg>
+        </button>
+        <img alt="User avatar" class="w-10 h-10 rounded-full" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDxyb2kzv2Cf0uMSxV56Y-s4_qMbdaIhdr6qC9yfAvFjosrkKmaijbHvo-YAQEYMA-EHw-MEAWY-mHMp0fhkjuMjv3P6vaKlta2Xt6TFqf_O4XBqeG2R3JrG5tLqriCGc5ju2rFirPFvd2VrI2hFv0WvtevFkJEyj7qf0UnUgtnDx0I1yqYTfDJS-TjxDkhEtHp6HmTbPP_IcRGlYw3Xug6kemRtCqI0u-sMsyR-jvZmlh7-gcWeWYauvCGRVjHblAEQetlc_9-1CcA" />
+      </div>
+    </div>
+  </header>
+  
+  <main class="flex-grow container mx-auto px-6 py-12">
+    <div class="max-w-3xl mx-auto bg-white p-8 rounded-xl shadow-lg">
+      <div class="text-center mb-8">
+        <h2 class="text-4xl font-bold text-slate-900">Consulta tu Reporte</h2>
+        <p class="text-gray-500 mt-2">Ingresa el número de folio para ver el estado y los detalles de tu solicitud.</p>
+      </div>
+      
+      <div class="flex flex-col sm:flex-row items-end gap-4 mb-10">
+        <div class="w-full">
+          <label class="block text-sm font-medium text-gray-700 mb-1" for="folio">Número de Folio</label>
+          <input 
+            [(ngModel)]="folio"
+            name="folio"
+            class="w-full px-4 py-3 rounded-md border-slate-300 focus:ring-blue-600 focus:border-blue-600 transition-shadow duration-200 shadow-sm"
+            id="folio" 
+            placeholder="Ej: BDR-2024-12345" 
+            type="text" />
+        </div>
+        <button 
+          (click)="buscarReporte()"
+          class="w-full sm:w-auto flex items-center justify-center gap-2 px-6 py-3 bg-blue-600 text-white font-semibold rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-600 transition-colors duration-200 shadow-sm whitespace-nowrap">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+          </svg>
+          <span>Buscar</span>
+        </button>
+      </div>
+      
+      <div *ngIf="reporteEncontrado" class="border-t border-slate-200 pt-8">
+        <h3 class="text-2xl font-bold text-slate-900 mb-6">Detalles del Reporte</h3>
+        <div class="space-y-6">
+          <div class="flex flex-col sm:flex-row">
+            <p class="w-full sm:w-1/3 text-gray-500 font-medium">Estado</p>
+            <div class="w-full sm:w-2/3 flex items-center gap-2">
+              <span class="px-3 py-1 text-sm font-semibold text-yellow-800 bg-yellow-100 rounded-full">
+                {{ reporte.estado }}
+              </span>
+            </div>
+          </div>
+          <div class="flex flex-col sm:flex-row">
+            <p class="w-full sm:w-1/3 text-gray-500 font-medium">Fecha de Reporte</p>
+            <p class="w-full sm:w-2/3 text-gray-700">{{ reporte.fecha }}</p>
+          </div>
+          <div class="flex flex-col sm:flex-row">
+            <p class="w-full sm:w-1/3 text-gray-500 font-medium">Tipo de Servicio</p>
+            <p class="w-full sm:w-2/3 text-gray-700">{{ reporte.tipo }}</p>
+          </div>
+          <div class="flex flex-col sm:flex-row">
+            <p class="w-full sm:w-1/3 text-gray-500 font-medium">Comentarios</p>
+            <p class="w-full sm:w-2/3 text-gray-700 leading-relaxed">{{ reporte.comentarios }}</p>
+          </div>
+        </div>
+      </div>
+      
+      <div *ngIf="!reporteEncontrado && folioConsultado" class="border-t border-slate-200 pt-8 text-center">
+        <p class="text-gray-500">No se encontró ningún reporte con el folio proporcionado.</p>
+      </div>
+    </div>
+  </main>
+  
+  <footer class="bg-white mt-12 border-t border-slate-200">
+    <div class="container mx-auto px-6 py-8 text-center text-gray-500">
+      <p>© 2024 H. Ayuntamiento de Boca del Río, Veracruz. Todos los derechos reservados.</p>
+      <div class="flex justify-center gap-4 mt-4">
+        <a class="hover:text-blue-600" href="#">Política de Privacidad</a>
+        <a class="hover:text-blue-600" href="#">Términos de Servicio</a>
+      </div>
+    </div>
+  </footer>
+</div>

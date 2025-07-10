@@ -1,0 +1,100 @@
+<div class="relative flex size-full min-h-screen flex-col group/design-root overflow-x-hidden">
+  <div class="layout-container flex h-full grow flex-col">
+    <header class="flex items-center justify-between whitespace-nowrap border-b border-solid border-slate-200 px-10 py-4">
+      <div class="flex items-center gap-3 text-slate-900">
+        <svg class="h-8 w-8 text-blue-600" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <path clip-rule="evenodd" d="M3 6C3 4.34315 4.34315 3 6 3H18C19.6569 3 21 4.34315 21 6V18C21 19.6569 19.6569 21 18 21H6C4.34315 21 3 19.6569 3 18V6ZM6 5C5.44772 5 5 5.44772 5 6V18C5 18.5523 5.44772 19 6 19H18C18.5523 19 19 18.5523 19 18V6C19 5.44772 18.5523 5 18 5H6ZM15.5 15.5H8.5V13.5H15.5V15.5ZM15.5 10.5H8.5V8.5H15.5V10.5Z" fill-rule="evenodd"></path>
+        </svg>
+        <h1 class="text-slate-900 text-xl font-bold tracking-tight">Ciudadano Boqueño</h1>
+      </div>
+      <nav class="hidden md:flex items-center gap-8">
+        <a routerLink="/inicio" class="text-slate-900 text-sm font-medium hover:text-blue-600 transition-colors">Inicio</a>
+        <a routerLink="/admin-panel" class="text-slate-900 text-sm font-medium hover:text-blue-600 transition-colors">Reportes</a>
+        <a href="#" class="text-slate-900 text-sm font-medium hover:text-blue-600 transition-colors">Nosotros</a>
+        <a href="#" class="text-slate-900 text-sm font-medium hover:text-blue-600 transition-colors">Contacto</a>
+      </nav>
+      <div class="flex gap-3">
+        <button class="flex min-w-[90px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-md h-10 px-5 bg-blue-600 text-slate-50 text-sm font-semibold tracking-wide shadow-sm hover:bg-blue-700 transition-colors">
+          <span class="truncate">Registrarse</span>
+        </button>
+        <button class="flex min-w-[90px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-md h-10 px-5 bg-slate-200 text-slate-900 text-sm font-semibold tracking-wide shadow-sm hover:bg-slate-300 transition-colors">
+          <span class="truncate">Iniciar Sesión</span>
+        </button>
+      </div>
+    </header>
+    
+    <main class="flex flex-1 items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+      <div class="w-full max-w-md space-y-8">
+        <div class="text-center">
+          <h2 class="text-3xl font-extrabold text-slate-900 tracking-tight">
+            Bienvenido a Boca del Río
+          </h2>
+          <p class="mt-2 text-md text-slate-600">
+            Reporta problemas, sigue tus solicitudes y conecta con tu ayuntamiento.
+          </p>
+        </div>
+        
+        <div class="mt-8 space-y-6 rounded-lg bg-white p-8 shadow-lg">
+          <form (ngSubmit)="onSubmit()" class="space-y-4">
+            <div>
+              <label class="sr-only" for="email">Correo electrónico</label>
+              <input 
+                [(ngModel)]="email" 
+                name="email"
+                class="form-input block w-full appearance-none rounded-md border border-slate-300 bg-slate-50 px-4 py-3 placeholder-slate-400 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-blue-500 sm:text-sm"
+                id="email" 
+                placeholder="Correo electrónico" 
+                required 
+                type="email" />
+            </div>
+            <div>
+              <label class="sr-only" for="password">Contraseña</label>
+              <input 
+                [(ngModel)]="password"
+                name="password"
+                class="form-input block w-full appearance-none rounded-md border border-slate-300 bg-slate-50 px-4 py-3 placeholder-slate-400 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-blue-500 sm:text-sm"
+                id="password" 
+                placeholder="Contraseña" 
+                required
+                type="password" />
+            </div>
+            
+            <div class="flex items-center justify-between">
+              <div class="text-sm">
+                <a class="font-medium text-blue-600 hover:text-blue-700" href="#">
+                  ¿Olvidaste tu contraseña?
+                </a>
+              </div>
+            </div>
+            
+            <div>
+              <button
+                class="group relative flex w-full justify-center rounded-md border border-transparent bg-blue-600 px-4 py-3 text-sm font-semibold text-white shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                type="submit">
+                Iniciar Sesión
+              </button>
+            </div>
+          </form>
+          
+          <div class="relative">
+            <div class="absolute inset-0 flex items-center">
+              <div class="w-full border-t border-slate-300"></div>
+            </div>
+            <div class="relative flex justify-center text-sm">
+              <span class="bg-white px-2 text-slate-500">O</span>
+            </div>
+          </div>
+          
+          <div class="space-y-4">
+            <a class="flex w-full justify-center rounded-md border border-slate-300 bg-white px-4 py-3 text-sm font-medium text-slate-600 shadow-sm hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-slate-400 focus:ring-offset-2" href="#">
+              ¿No tienes cuenta? Regístrate
+            </a>
+            <a class="flex w-full justify-center rounded-md border border-transparent bg-slate-100 px-4 py-3 text-sm font-medium text-slate-600 shadow-sm hover:bg-slate-200 focus:outline-none focus:ring-2 focus:ring-slate-400 focus:ring-offset-2" href="#">
+              Continuar como invitado
+            </a>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+</div>

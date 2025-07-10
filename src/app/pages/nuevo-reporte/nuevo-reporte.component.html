@@ -1,0 +1,115 @@
+<div class="flex flex-col min-h-screen bg-slate-50 font-sans text-slate-900">
+  <header class="bg-white shadow-sm">
+    <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex items-center justify-between h-16">
+        <div class="flex items-center gap-4">
+          <svg class="h-8 w-8 text-blue-600" fill="none" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
+            <path d="M6 6H42L36 24L42 42H6L12 24L6 6Z" fill="currentColor"></path>
+          </svg>
+          <h1 class="text-xl font-bold">Reporte Ciudadano</h1>
+        </div>
+        <nav class="hidden md:flex items-center gap-8">
+          <a routerLink="/inicio" class="text-sm font-medium hover:text-blue-600 transition-colors">Inicio</a>
+          <a routerLink="/mis-reportes" class="text-sm font-medium hover:text-blue-600 transition-colors">Mis Reportes</a>
+          <a href="#" class="text-sm font-medium hover:text-blue-600 transition-colors">Acerca de</a>
+        </nav>
+        <div class="flex items-center gap-4">
+          <button class="p-2 rounded-full hover:bg-slate-200 transition-colors">
+            <svg fill="currentColor" height="24" viewBox="0 0 256 256" width="24" xmlns="http://www.w3.org/2000/svg">
+              <path d="M221.8,175.94C216.25,166.38,208,139.33,208,104a80,80,0,1,0-160,0c0,35.34-8.26,62.38-13.81,71.94A16,16,0,0,0,48,200H88.81a40,40,0,0,0,78.38,0H208a16,16,0,0,0,13.8-24.06ZM128,216a24,24,0,0,1-22.62-16h45.24A24,24,0,0,1,128,216ZM48,184c7.7-13.24,16-43.92,16-80a64,64,0,1,1,128,0c0,36.05,8.28,66.73,16,80Z"></path>
+            </svg>
+          </button>
+          <div class="bg-center bg-no-repeat aspect-square bg-cover rounded-full h-10 w-10" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuCeq-RbE1qUjmkCvgiKB4yVIrcZFkkxEXQD4LmFSBnfh--avBhXcfkv38GLpSZSrc0ruqjEB_hxXt4wrgpXzoe-TWEawEWSHiL9V7sw3_WQcEWuIpvIdhgSN2-DUQiyFE0WhfUCDsDPe7ylVTH0Z1HwsRy32kJRilTiuO2BHVd8UpmmdTBOFfEFBRxXyv4iVE4pBJwytX9tK8_i3cjSXVCeMmAjEp3Ilimj-Yy6DgvcrJXXIsLKs222Bm_ydaqwrbGFzlv3NkqHOjjo");'></div>
+        </div>
+      </div>
+    </div>
+  </header>
+  
+  <main class="flex-grow container mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <div class="max-w-3xl mx-auto bg-white p-8 rounded-lg shadow-md">
+      <div class="mb-8 text-center">
+        <h2 class="text-3xl font-bold text-slate-900">Crear un Reporte de Servicio</h2>
+        <p class="text-slate-600 mt-2">Ayúdanos a mejorar Boca del Río reportando problemas.</p>
+      </div>
+      
+      <form (ngSubmit)="onSubmit()" class="space-y-6">
+        <div>
+          <label class="block text-sm font-medium text-slate-900 mb-1" for="service-type">Tipo de Servicio</label>
+          <select 
+            [(ngModel)]="reporte.tipoServicio"
+            name="tipoServicio"
+            class="w-full h-12 px-4 rounded-md border border-slate-300 bg-white focus:ring-2 focus:ring-blue-600 focus:border-blue-600 transition"
+            id="service-type">
+            <option value="">Seleccione un tipo de servicio</option>
+            <option value="lampara">Lámpara fundida o averiada</option>
+            <option value="bache">Bache en la calle</option>
+            <option value="fuga">Fuga de agua</option>
+            <option value="basura">Basura acumulada</option>
+            <option value="otro">Otro</option>
+          </select>
+        </div>
+        
+        <div>
+          <label class="block text-sm font-medium text-slate-900 mb-1" for="address">Dirección / Ubicación</label>
+          <input 
+            [(ngModel)]="reporte.direccion"
+            name="direccion"
+            class="w-full h-12 px-4 rounded-md border border-slate-300 focus:ring-2 focus:ring-blue-600 focus:border-blue-600 transition"
+            id="address" 
+            placeholder="Ej. Av. Ruiz Cortines #123, Col. Centro"
+            type="text" />
+        </div>
+        
+        <div>
+          <p class="text-sm font-medium text-slate-900 mb-1">Ubicación en el Mapa (Opcional)</p>
+          <div class="w-full h-64 bg-center bg-no-repeat bg-cover rounded-md border border-slate-300" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuDYh-oHWfX_chqFvJz7mFIfAfIb2Jxn0oTyHj_43IGTASV4hEmHCwqb1nuADAToOXP0n2VTCRextZELcgBdKmEg3zRQvRqA2nzSblMjTUpvN5p_imb4x6-1VwTsBNMRb2eknxGZo-1le_119GxTNiEKjHvCyGmjjyFkNN7s1-hTkrGlz6513YlYsVkCJTIY15mLbV8cPb3J8JtakXyG-yi2T5YEyZjryCcLctuZj8pMontAIJtjJ8_BCPd20dit4LxwB1KJh7AZKK42");'></div>
+          <p class="text-xs text-slate-600 mt-1 text-center">Arrastra el marcador a la ubicación exacta del problema en Boca del Río.</p>
+        </div>
+        
+        <div>
+          <label class="block text-sm font-medium text-slate-900 mb-1" for="photo-upload">Evidencias Fotográficas</label>
+          <div class="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-slate-300 border-dashed rounded-md">
+            <div class="space-y-1 text-center">
+              <svg aria-hidden="true" class="mx-auto h-12 w-12 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 48 48">
+                <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+              </svg>
+              <div class="flex text-sm text-slate-600">
+                <label class="relative cursor-pointer bg-white rounded-md font-medium text-blue-600 hover:text-blue-700 focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-blue-600" for="file-upload">
+                  <span>Subir un archivo</span>
+                  <input class="sr-only" id="file-upload" name="file-upload" type="file" />
+                </label>
+                <p class="pl-1">o arrastrar y soltar</p>
+              </div>
+              <p class="text-xs text-slate-600">PNG, JPG hasta 10MB</p>
+            </div>
+          </div>
+        </div>
+        
+        <div>
+          <label class="block text-sm font-medium text-slate-900 mb-1" for="comments">Comentarios</label>
+          <textarea 
+            [(ngModel)]="reporte.comentarios"
+            name="comentarios"
+            class="w-full p-4 rounded-md border border-slate-300 focus:ring-2 focus:ring-blue-600 focus:border-blue-600 transition"
+            id="comments" 
+            placeholder="Agregue detalles adicionales que puedan ser útiles."
+            rows="4"></textarea>
+        </div>
+        
+        <div class="pt-4">
+          <button
+            class="w-full flex justify-center py-3 px-4 border border-transparent rounded-md shadow-sm text-sm font-bold text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-600 transition-colors"
+            type="submit">
+            Enviar Reporte
+          </button>
+        </div>
+      </form>
+    </div>
+  </main>
+  
+  <footer class="bg-white mt-auto">
+    <div class="container mx-auto py-6 px-4 sm:px-6 lg:px-8 text-center text-slate-600 text-sm">
+      <p>© 2024 Reporte Ciudadano Boca del Río. Todos los derechos reservados.</p>
+    </div>
+  </footer>
+</div>
