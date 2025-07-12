@@ -32,32 +32,64 @@
         <p class="text-slate-600 mt-2">Ayúdanos a mejorar Boca del Río reportando problemas.</p>
       </div>
       
-      <form (ngSubmit)="onSubmit()" class="space-y-6">
+      <!-- Mensajes de estado -->
+      <div *ngIf="successMessage" class="mb-4 p-4 bg-green-100 border border-green-400 text-green-700 rounded-md">
+        {{ successMessage }}
+      </div>
+      <div *ngIf="errorMessage" class="mb-4 p-4 bg-red-100 border border-red-400 text-red-700 rounded-md">
+        {{ errorMessage }}
+      </div>
+      
+      <form [formGroup]="reporteForm" (ngSubmit)="onSubmit()" class="space-y-6">
+        <!-- Información del Ciudadano -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label class="block text-sm font-medium text-slate-900 mb-1" for="ciudadano-nombre">Nombre Completo</label>
+            <input 
+              formControlName="ciudadanoNombre"
+              class="w-full h-12 px-4 rounded-md border border-slate-300 focus:ring-2 focus:ring-blue-600 focus:border-blue-600 transition"
+              [class.border-red-500]="hasError('ciudadanoNombre')"
+              id="ciudadano-nombre" 
+              placeholder="Su nombre completo"
+              type="text" />
+            <p *ngIf="hasError('ciudadanoNombre')" class="text-red-500 text-xs mt-1">{{ getErrorMessage('ciudadanoNombre') }}</p>
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-slate-900 mb-1" for="ciudadano-email">Correo Electrónico</label>
+            <input 
+              formControlName="ciudadanoEmail"
+              class="w-full h-12 px-4 rounded-md border border-slate-300 focus:ring-2 focus:ring-blue-600 focus:border-blue-600 transition"
+              [class.border-red-500]="hasError('ciudadanoEmail')"
+              id="ciudadano-email" 
+              placeholder="su.email@ejemplo.com"
+              type="email" />
+            <p *ngIf="hasError('ciudadanoEmail')" class="text-red-500 text-xs mt-1">{{ getErrorMessage('ciudadanoEmail') }}</p>
+          </div>
+        </div>
+        
         <div>
           <label class="block text-sm font-medium text-slate-900 mb-1" for="service-type">Tipo de Servicio</label>
           <select 
-            [(ngModel)]="reporte.tipoServicio"
-            name="tipoServicio"
+            formControlName="tipoServicio"
             class="w-full h-12 px-4 rounded-md border border-slate-300 bg-white focus:ring-2 focus:ring-blue-600 focus:border-blue-600 transition"
+            [class.border-red-500]="hasError('tipoServicio')"
             id="service-type">
             <option value="">Seleccione un tipo de servicio</option>
-            <option value="lampara">Lámpara fundida o averiada</option>
-            <option value="bache">Bache en la calle</option>
-            <option value="fuga">Fuga de agua</option>
-            <option value="basura">Basura acumulada</option>
-            <option value="otro">Otro</option>
+            <option *ngFor="let tipo of tiposServicio" [value]="tipo.value">{{ tipo.label }}</option>
           </select>
+          <p *ngIf="hasError('tipoServicio')" class="text-red-500 text-xs mt-1">{{ getErrorMessage('tipoServicio') }}</p>
         </div>
         
         <div>
           <label class="block text-sm font-medium text-slate-900 mb-1" for="address">Dirección / Ubicación</label>
           <input 
-            [(ngModel)]="reporte.direccion"
-            name="direccion"
+            formControlName="direccion"
             class="w-full h-12 px-4 rounded-md border border-slate-300 focus:ring-2 focus:ring-blue-600 focus:border-blue-600 transition"
+            [class.border-red-500]="hasError('direccion')"
             id="address" 
             placeholder="Ej. Av. Ruiz Cortines #123, Col. Centro"
             type="text" />
+          <p *ngIf="hasError('direccion')" class="text-red-500 text-xs mt-1">{{ getErrorMessage('direccion') }}</p>
         </div>
         
         <div>
@@ -76,7 +108,7 @@
               <div class="flex text-sm text-slate-600">
                 <label class="relative cursor-pointer bg-white rounded-md font-medium text-blue-600 hover:text-blue-700 focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-blue-600" for="file-upload">
                   <span>Subir un archivo</span>
-                  <input class="sr-only" id="file-upload" name="file-upload" type="file" />
+                  <input class="sr-only" id="file-upload" name="file-upload" type="file" accept="image/*" (change)="onFileSelected($event)" />
                 </label>
                 <p class="pl-1">o arrastrar y soltar</p>
               </div>
@@ -88,19 +120,28 @@
         <div>
           <label class="block text-sm font-medium text-slate-900 mb-1" for="comments">Comentarios</label>
           <textarea 
-            [(ngModel)]="reporte.comentarios"
-            name="comentarios"
+            formControlName="comentarios"
             class="w-full p-4 rounded-md border border-slate-300 focus:ring-2 focus:ring-blue-600 focus:border-blue-600 transition"
+            [class.border-red-500]="hasError('comentarios')"
             id="comments" 
             placeholder="Agregue detalles adicionales que puedan ser útiles."
             rows="4"></textarea>
+          <p *ngIf="hasError('comentarios')" class="text-red-500 text-xs mt-1">{{ getErrorMessage('comentarios') }}</p>
         </div>
         
         <div class="pt-4">
           <button
-            class="w-full flex justify-center py-3 px-4 border border-transparent rounded-md shadow-sm text-sm font-bold text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-600 transition-colors"
+            [disabled]="isLoading || reporteForm.invalid"
+            class="w-full flex justify-center py-3 px-4 border border-transparent rounded-md shadow-sm text-sm font-bold text-white transition-colors"
+            [class]="isLoading || reporteForm.invalid ? 'bg-gray-400 cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-600'"
             type="submit">
-            Enviar Reporte
+            <span *ngIf="isLoading" class="mr-2">
+              <svg class="animate-spin h-4 w-4" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+              </svg>
+            </span>
+            {{ isLoading ? 'Enviando...' : 'Enviar Reporte' }}
           </button>
         </div>
       </form>
