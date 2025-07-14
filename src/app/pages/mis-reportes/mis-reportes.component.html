@@ -39,7 +39,7 @@
             <div class="flex items-center gap-3 px-3 py-2">
               <div class="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-10" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuBzCk9tQA3K0yvJXfu4g26POR8UxC0CbUBmoL6JZm1IHD7ej0BnWC_tTwzFlWPCrh2_nM0Z2peLkt99lFsyWZK9qKLwajBCnr8kKA7ZCMJYuCCW1Xz_YivxIFAjzsXEOiTWc7d3TlILuD0xDUO2RDojAWsDrmYQg58-Ii4kuxTDNdabMiUd-W0_Mp8sjP_JUplDBtg1A-aV6iCS5XpV0EFMi42RIVpHhsUgTao5bUxDgOBKC4ZJkmxUkHoncuvWCcEAsceaPWSxID5v');"></div>
               <div class="flex flex-col">
-                <p class="text-slate-900 text-sm font-semibold">Sofia Ramirez</p>
+                <p class="text-slate-900 text-sm font-semibold">{{ currentUser?.nombre || 'Usuario' }}</p>
                 <a class="text-xs text-slate-500 hover:text-slate-900" href="#">Log out</a>
               </div>
             </div>
@@ -50,8 +50,8 @@
       <main class="flex-1 p-8">
         <div class="max-w-4xl mx-auto">
           <div class="mb-8">
-            <h1 class="text-4xl font-bold text-slate-800">Perfil</h1>
-            <p class="text-slate-500 mt-1">Gestiona tu información personal y ve el historial de tus reportes.</p>
+            <h1 class="text-4xl font-bold text-slate-800">Mis Reportes</h1>
+            <p class="text-slate-500 mt-1">Consulta y gestiona todos los reportes que has enviado.</p>
           </div>
           
           <div class="bg-white p-6 rounded-2xl shadow-sm mb-8">
@@ -65,39 +65,113 @@
                 </button>
               </div>
               <div>
-                <h2 class="text-2xl font-bold text-slate-800">Sofia Ramirez</h2>
-                <p class="text-slate-500">Miembro desde 2022</p>
+                <h2 class="text-2xl font-bold text-slate-800">{{ currentUser?.nombre || 'Usuario' }}</h2>
+                <p class="text-slate-500">Miembro desde {{ currentUser?.fechaRegistro | date:'yyyy' }}</p>
               </div>
             </div>
           </div>
           
           <div class="bg-white p-6 rounded-2xl shadow-sm">
-            <h3 class="text-xl font-bold text-slate-800 mb-6">Historial de Reportes</h3>
-            <div class="overflow-x-auto">
+            <div class="flex justify-between items-center mb-6">
+              <h3 class="text-xl font-bold text-slate-800">Mis Reportes</h3>
+              <button 
+                (click)="recargarReportes()" 
+                class="flex items-center gap-2 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                [disabled]="loading">
+                <svg *ngIf="!loading" class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+                </svg>
+                <div *ngIf="loading" class="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                {{ loading ? 'Cargando...' : 'Actualizar' }}
+              </button>
+            </div>
+            
+            <!-- Estado de carga -->
+            <div *ngIf="loading && reportes.length === 0" class="flex justify-center items-center py-12">
+              <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
+              <span class="ml-3 text-slate-600">Cargando reportes...</span>
+            </div>
+            
+            <!-- Error -->
+            <div *ngIf="error" class="bg-red-50 border border-red-200 rounded-lg p-4 mb-4">
+              <div class="flex items-center">
+                <svg class="h-5 w-5 text-red-400 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                  <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"></path>
+                </svg>
+                <span class="text-red-800 text-sm">{{ error }}</span>
+              </div>
+            </div>
+            
+            <!-- Sin reportes -->
+            <div *ngIf="!loading && !error && reportes.length === 0" class="text-center py-12">
+              <svg class="mx-auto h-12 w-12 text-slate-400 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+              </svg>
+              <h3 class="text-lg font-medium text-slate-900 mb-2">No tienes reportes</h3>
+              <p class="text-slate-500 mb-4">Aún no has creado ningún reporte. ¡Comienza reportando un problema en tu comunidad!</p>
+              <a routerLink="/nuevo-reporte" class="inline-flex items-center px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
+                <svg class="h-4 w-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+                </svg>
+                Crear mi primer reporte
+              </a>
+            </div>
+            
+            <!-- Tabla de reportes -->
+            <div *ngIf="!loading && !error && reportes.length > 0" class="overflow-x-auto">
               <table class="w-full text-left">
                 <thead>
                   <tr class="border-b border-slate-200">
-                    <th class="px-4 py-3 text-sm font-semibold text-slate-600">ID del Reporte</th>
+                    <th class="px-4 py-3 text-sm font-semibold text-slate-600">Tipo de Servicio</th>
+                    <th class="px-4 py-3 text-sm font-semibold text-slate-600">Dirección</th>
                     <th class="px-4 py-3 text-sm font-semibold text-slate-600">Fecha</th>
                     <th class="px-4 py-3 text-sm font-semibold text-slate-600">Estado</th>
+                    <th class="px-4 py-3 text-sm font-semibold text-slate-600">Prioridad</th>
                     <th class="px-4 py-3 text-sm font-semibold text-slate-600"></th>
                   </tr>
                 </thead>
                 <tbody>
                   <tr *ngFor="let reporte of reportes" class="border-b border-slate-200 hover:bg-slate-50">
-                    <td class="px-4 py-3 text-sm text-slate-700">{{ reporte.id }}</td>
-                    <td class="px-4 py-3 text-sm text-slate-700">{{ reporte.fecha }}</td>
+                    <td class="px-4 py-3 text-sm text-slate-700">
+                      <div class="font-medium">{{ getTipoServicioText(reporte.tipoServicio) }}</div>
+                    </td>
+                    <td class="px-4 py-3 text-sm text-slate-700">
+                      <div class="max-w-xs truncate" [title]="reporte.direccion">{{ reporte.direccion }}</div>
+                    </td>
+                    <td class="px-4 py-3 text-sm text-slate-700">{{ formatearFecha(reporte.fechaCreacion) }}</td>
                     <td class="px-4 py-3 text-sm">
                       <span [ngClass]="getStatusClass(reporte.estado)" class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium">
-                        {{ reporte.estado }}
+                        {{ getStatusText(reporte.estado) }}
                       </span>
                     </td>
-                    <td class="px-4 py-3 text-sm text-blue-500 font-semibold hover:underline cursor-pointer">
-                      Ver Detalles
+                    <td class="px-4 py-3 text-sm">
+                      <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium"
+                            [ngClass]="{
+                              'bg-red-100 text-red-800': reporte.prioridad === 'critica',
+                              'bg-orange-100 text-orange-800': reporte.prioridad === 'alta',
+                              'bg-yellow-100 text-yellow-800': reporte.prioridad === 'media',
+                              'bg-green-100 text-green-800': reporte.prioridad === 'baja'
+                            }">
+                        {{ reporte.prioridad | titlecase }}
+                      </span>
+                    </td>
+                    <td class="px-4 py-3 text-sm">
+                      <button 
+                        (click)="verDetalle(reporte.id!)" 
+                        class="text-blue-500 font-semibold hover:underline focus:outline-none focus:underline">
+                        Ver Detalles
+                      </button>
                     </td>
                   </tr>
                 </tbody>
               </table>
+            </div>
+            
+            <!-- Resumen -->
+            <div *ngIf="reportes.length > 0" class="mt-6 pt-4 border-t border-slate-200">
+              <p class="text-sm text-slate-600">
+                Total de reportes: <span class="font-semibold">{{ reportes.length }}</span>
+              </p>
             </div>
           </div>
         </div>

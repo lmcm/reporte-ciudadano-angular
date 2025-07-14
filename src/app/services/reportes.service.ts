@@ -29,6 +29,7 @@ export interface ReporteFilter {
   prioridad?: PrioridadReporte;
   tipoServicio?: TipoServicio;
   ciudadanoId?: string;
+  ciudadanoEmail?: string;
   fechaDesde?: Date;
   fechaHasta?: Date;
 }
@@ -147,13 +148,23 @@ export class ReportesService {
   ): Observable<{ reportes: Reporte[], lastDoc?: DocumentSnapshot }> {
     this.logger.debug('Obteniendo reportes con filtros', { filtros, paginacion });
     
-    const constraints: QueryConstraint[] = [
-      where('activo', '==', true),
-      orderBy('fechaCreacion', 'desc')
-    ];
+    const constraints: QueryConstraint[] = [];
 
-    // Aplicar filtros
-    if (filtros) {
+    // Para consultas de usuario específico, usar ciudadanoId o ciudadanoEmail sin orderBy para evitar índice compuesto
+    if (filtros?.ciudadanoId) {
+      constraints.push(where('ciudadanoId', '==', filtros.ciudadanoId));
+      constraints.push(where('activo', '==', true));
+    } else if (filtros?.ciudadanoEmail) {
+      constraints.push(where('ciudadanoEmail', '==', filtros.ciudadanoEmail));
+      constraints.push(where('activo', '==', true));
+    } else {
+      // Para consultas generales, usar solo activo y orderBy
+      constraints.push(where('activo', '==', true));
+      constraints.push(orderBy('fechaCreacion', 'desc'));
+    }
+
+    // Aplicar otros filtros solo si no hay ciudadanoId ni ciudadanoEmail
+    if (filtros && !filtros.ciudadanoId && !filtros.ciudadanoEmail) {
       if (filtros.estado) {
         constraints.push(where('estado', '==', filtros.estado));
       }
@@ -162,15 +173,6 @@ export class ReportesService {
       }
       if (filtros.tipoServicio) {
         constraints.push(where('tipoServicio', '==', filtros.tipoServicio));
-      }
-      if (filtros.ciudadanoId) {
-        constraints.push(where('ciudadanoId', '==', filtros.ciudadanoId));
-      }
-      if (filtros.fechaDesde) {
-        constraints.push(where('fechaCreacion', '>=', Timestamp.fromDate(filtros.fechaDesde)));
-      }
-      if (filtros.fechaHasta) {
-        constraints.push(where('fechaCreacion', '<=', Timestamp.fromDate(filtros.fechaHasta)));
       }
     }
 
@@ -187,13 +189,22 @@ export class ReportesService {
     return from(getDocs(q))
       .pipe(
         map(querySnapshot => {
-          const reportes: Reporte[] = [];
+          let reportes: Reporte[] = [];
           let lastDoc: DocumentSnapshot | undefined;
 
           querySnapshot.forEach(doc => {
             reportes.push({ id: doc.id, ...doc.data() } as Reporte);
             lastDoc = doc;
           });
+
+          // Si hay ciudadanoId o ciudadanoEmail, ordenar manualmente por fecha
+          if (filtros?.ciudadanoId || filtros?.ciudadanoEmail) {
+            reportes = reportes.sort((a, b) => {
+              const fechaA = a.fechaCreacion instanceof Timestamp ? a.fechaCreacion.toDate() : new Date(a.fechaCreacion);
+              const fechaB = b.fechaCreacion instanceof Timestamp ? b.fechaCreacion.toDate() : new Date(b.fechaCreacion);
+              return fechaB.getTime() - fechaA.getTime();
+            });
+          }
 
           this.logger.debug('Reportes obtenidos', { count: reportes.length });
           return { reportes, lastDoc };
@@ -209,17 +220,24 @@ export class ReportesService {
   escucharReportes(filtros?: ReporteFilter): Observable<Reporte[]> {
     this.logger.info('Iniciando escucha en tiempo real de reportes', { filtros });
     
-    const constraints: QueryConstraint[] = [
-      where('activo', '==', true),
-      orderBy('fechaCreacion', 'desc')
-    ];
+    const constraints: QueryConstraint[] = [];
 
-    if (filtros) {
+    // Para consultas de usuario específico, evitar orderBy para prevenir índice compuesto
+    if (filtros?.ciudadanoId) {
+      constraints.push(where('ciudadanoId', '==', filtros.ciudadanoId));
+      constraints.push(where('activo', '==', true));
+    } else if (filtros?.ciudadanoEmail) {
+      constraints.push(where('ciudadanoEmail', '==', filtros.ciudadanoEmail));
+      constraints.push(where('activo', '==', true));
+    } else {
+      constraints.push(where('activo', '==', true));
+      constraints.push(orderBy('fechaCreacion', 'desc'));
+    }
+
+    // Aplicar otros filtros solo si no hay ciudadanoId ni ciudadanoEmail
+    if (filtros && !filtros.ciudadanoId && !filtros.ciudadanoEmail) {
       if (filtros.estado) {
         constraints.push(where('estado', '==', filtros.estado));
-      }
-      if (filtros.ciudadanoId) {
-        constraints.push(where('ciudadanoId', '==', filtros.ciudadanoId));
       }
     }
 
@@ -228,10 +246,20 @@ export class ReportesService {
     return new Observable<Reporte[]>(observer => {
       const unsubscribe = onSnapshot(q, 
         (querySnapshot) => {
-          const reportes: Reporte[] = [];
+          let reportes: Reporte[] = [];
           querySnapshot.forEach(doc => {
             reportes.push({ id: doc.id, ...doc.data() } as Reporte);
           });
+          
+          // Si hay ciudadanoId o ciudadanoEmail, ordenar manualmente por fecha
+          if (filtros?.ciudadanoId || filtros?.ciudadanoEmail) {
+            reportes = reportes.sort((a, b) => {
+              const fechaA = a.fechaCreacion instanceof Timestamp ? a.fechaCreacion.toDate() : new Date(a.fechaCreacion);
+              const fechaB = b.fechaCreacion instanceof Timestamp ? b.fechaCreacion.toDate() : new Date(b.fechaCreacion);
+              return fechaB.getTime() - fechaA.getTime();
+            });
+          }
+          
           this.reportesSubject.next(reportes);
           observer.next(reportes);
           this.logger.debug('Reportes actualizados en tiempo real', { count: reportes.length });

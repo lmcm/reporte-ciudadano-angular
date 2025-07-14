@@ -1,4 +1,4 @@
-import { ErrorHandler, Injectable, NgZone } from '@angular/core';
+import { ErrorHandler, Inject, Injectable, NgZone } from '@angular/core';
 import { LoggerService } from './logger.service';
 import { ErrorHandlerService } from './error-handler.service';
 
@@ -6,7 +6,7 @@ import { ErrorHandlerService } from './error-handler.service';
 export class GlobalErrorHandler implements ErrorHandler {
   constructor(
     private logger: LoggerService,
-    private errorHandlerService: ErrorHandlerService,
+    @Inject(ErrorHandlerService) private errorHandlerService: ErrorHandlerService,
     private ngZone: NgZone
   ) {}
 
