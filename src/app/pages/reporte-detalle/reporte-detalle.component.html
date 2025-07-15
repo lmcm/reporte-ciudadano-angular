@@ -97,8 +97,16 @@
           </div>
           
           <div>
-            <label class="block text-sm font-medium text-slate-900 pb-1.5">Estado</label>
-            <input class="form-input w-full rounded-md border-slate-300 bg-gray-50 text-slate-900" disabled [value]="getStatusText(reporte.estado)" />
+            <label class="block text-sm font-medium text-slate-900 pb-1.5">Prioridad</label>
+            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium"
+                  [ngClass]="{
+                    'bg-red-100 text-red-800': reporte.prioridad === 'critica',
+                    'bg-orange-100 text-orange-800': reporte.prioridad === 'alta',
+                    'bg-yellow-100 text-yellow-800': reporte.prioridad === 'media',
+                    'bg-green-100 text-green-800': reporte.prioridad === 'baja'
+                  }">
+              {{ reporte.prioridad | titlecase }}
+            </span>
           </div>
           
           <div class="md:col-span-2">
@@ -126,22 +134,44 @@
             <input class="form-input w-full rounded-md border-slate-300 bg-gray-50 text-slate-900" disabled [value]="reporte.ciudadanoTelefono" />
           </div>
           
+          <hr class="md:col-span-2 my-4" />
+          
           <div>
-            <label class="block text-sm font-medium text-slate-900 pb-1.5">Prioridad</label>
-            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium"
-                  [ngClass]="{
-                    'bg-red-100 text-red-800': reporte.prioridad === 'critica',
-                    'bg-orange-100 text-orange-800': reporte.prioridad === 'alta',
-                    'bg-yellow-100 text-yellow-800': reporte.prioridad === 'media',
-                    'bg-green-100 text-green-800': reporte.prioridad === 'baja'
-                  }">
-              {{ reporte.prioridad | titlecase }}
-            </span>
+            <label class="block text-sm font-medium text-slate-900 pb-1.5">Estado</label>
+            <select 
+              [(ngModel)]="reporte.estado"
+              class="form-select w-full rounded-md border-slate-300 text-slate-900 focus:ring-blue-500 focus:border-blue-500">
+              <option value="pendiente">Pendiente</option>
+              <option value="en_progreso">En Progreso</option>
+              <option value="completado">Completado</option>
+              <option value="cancelado">Cancelado</option>
+            </select>
+          </div>
+          
+          <div>
+            <label class="block text-sm font-medium text-slate-900 pb-1.5">Área Asignada</label>
+            <select 
+              [(ngModel)]="areaAsignada"
+              class="form-select w-full rounded-md border-slate-300 text-slate-900 focus:ring-blue-500 focus:border-blue-500">
+              <option value="">Sin asignar</option>
+              <option value="obras_publicas">Obras Públicas</option>
+              <option value="servicios_publicos">Servicios Públicos</option>
+              <option value="alumbrado">Alumbrado Público</option>
+              <option value="agua_potable">Agua Potable</option>
+              <option value="limpia">Limpia y Recolección</option>
+            </select>
           </div>
           
           <div class="md:col-span-2 mt-8 flex justify-between">
             <button (click)="volver()" class="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50">
               ← Volver a Mis Reportes
+            </button>
+            <button 
+              (click)="guardarCambios()"
+              [disabled]="actualizandoEstado || actualizandoArea"
+              class="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-md shadow-sm text-sm font-medium hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed">
+              <span *ngIf="actualizandoEstado || actualizandoArea" class="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></span>
+              {{ (actualizandoEstado || actualizandoArea) ? 'Guardando...' : 'Guardar Cambios' }}
             </button>
           </div>
         </div>

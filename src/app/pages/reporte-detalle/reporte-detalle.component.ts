@@ -32,6 +32,9 @@ export class ReporteDetalleComponent implements OnInit, OnDestroy {
   error: string | null = null;
   nuevoComentario = '';
   enviandoComentario = false;
+  areaAsignada = '';
+  actualizandoEstado = false;
+  actualizandoArea = false;
 
   ngOnInit() {
     this.reporteId = this.route.snapshot.paramMap.get('id') || '';
@@ -59,6 +62,7 @@ export class ReporteDetalleComponent implements OnInit, OnDestroy {
         next: (reporte) => {
           if (reporte) {
             this.reporte = reporte;
+            this.areaAsignada = reporte.personalAsignado || '';
           } else {
             this.error = 'Reporte no encontrado';
           }
@@ -196,5 +200,32 @@ export class ReporteDetalleComponent implements OnInit, OnDestroy {
       return `${primerNombre} ${primerApellido}`;
     }
     return palabras[0].charAt(0).toUpperCase() + palabras[0].slice(1).toLowerCase();
+  }
+
+  guardarCambios() {
+    if (!this.reporte || this.actualizandoEstado || this.actualizandoArea) return;
+    
+    this.actualizandoEstado = true;
+    this.actualizandoArea = true;
+    
+    const updates = {
+      estado: this.reporte.estado,
+      personalAsignado: this.areaAsignada
+    };
+    
+    this.reportesService.actualizarReporte(this.reporteId, updates)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: () => {
+          console.log('Cambios guardados correctamente');
+          this.actualizandoEstado = false;
+          this.actualizandoArea = false;
+        },
+        error: (error) => {
+          console.error('Error al guardar cambios:', error);
+          this.actualizandoEstado = false;
+          this.actualizandoArea = false;
+        }
+      });
   }
 }
