@@ -20,6 +20,7 @@ export class LoginComponent implements OnInit {
   email = '';
   password = '';
   nombre = '';
+  apellidos = '';
   loading = false;
   error = '';
   private redirectPage = '/mis-reportes';
@@ -74,6 +75,7 @@ export class LoginComponent implements OnInit {
   private register() {
     const data: RegisterData = {
       nombre: this.nombre,
+      apellidos: this.apellidos,
       email: this.email,
       password: this.password
     };
@@ -93,6 +95,7 @@ export class LoginComponent implements OnInit {
     this.email = '';
     this.password = '';
     this.nombre = '';
+    this.apellidos = '';
     this.error = '';
   }
 }

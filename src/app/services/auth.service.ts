@@ -5,6 +5,7 @@ import { delay } from 'rxjs/operators';
 export interface Usuario {
   id: string;
   nombre: string;
+  apellidos: string;
   email: string;
   fechaRegistro: Date;
 }
@@ -16,6 +17,7 @@ export interface LoginCredentials {
 
 export interface RegisterData {
   nombre: string;
+  apellidos: string;
   email: string;
   password: string;
 }
@@ -63,6 +65,7 @@ export class AuthService {
     const newUser: Usuario = {
       id: this.generateId(),
       nombre: data.nombre,
+      apellidos: data.apellidos,
       email: data.email,
       fechaRegistro: new Date()
     };

@@ -94,6 +94,47 @@ export class ReporteValidators {
     };
   }
 
+  // Validador para apellidos
+  static apellidos(): ValidatorFn {
+    return (control: AbstractControl): ValidationErrors | null => {
+      if (!control.value) return null;
+      
+      const value = control.value.trim();
+      
+      if (value.length < 2) {
+        return { apellidosMuyCorto: true };
+      }
+      
+      if (value.length > 100) {
+        return { apellidosMuyLargo: true };
+      }
+      
+      const nameRegex = /^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s'-]+$/;
+      if (!nameRegex.test(value)) {
+        return { apellidosInvalido: true };
+      }
+      
+      return null;
+    };
+  }
+
+  // Validador para teléfono celular
+  static telefono(): ValidatorFn {
+    return (control: AbstractControl): ValidationErrors | null => {
+      if (!control.value) return null;
+      
+      const value = control.value.trim();
+      
+      // Formato mexicano: 10 dígitos
+      const phoneRegex = /^[0-9]{10}$/;
+      if (!phoneRegex.test(value)) {
+        return { telefonoInvalido: true };
+      }
+      
+      return null;
+    };
+  }
+
   // Validador para URLs de evidencias fotográficas
   static evidenciasFotograficas(): ValidatorFn {
     return (control: AbstractControl): ValidationErrors | null => {
@@ -161,6 +202,22 @@ export class ReporteValidators {
     
     if (errors['nombreInvalido']) {
       return 'El nombre solo puede contener letras, espacios y algunos caracteres especiales';
+    }
+    
+    if (errors['apellidosMuyCorto']) {
+      return 'Los apellidos deben tener al menos 2 caracteres';
+    }
+    
+    if (errors['apellidosMuyLargo']) {
+      return 'Los apellidos no pueden exceder 100 caracteres';
+    }
+    
+    if (errors['apellidosInvalido']) {
+      return 'Los apellidos solo pueden contener letras, espacios y algunos caracteres especiales';
+    }
+    
+    if (errors['telefonoInvalido']) {
+      return 'Ingrese un teléfono válido de 10 dígitos';
     }
     
     if (errors['demasiadasEvidencias']) {

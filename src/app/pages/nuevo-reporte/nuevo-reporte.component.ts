@@ -1,9 +1,10 @@
-import { Component, OnDestroy, inject } from '@angular/core';
+import { Component, OnDestroy, inject, OnInit } from '@angular/core';
 import { RouterLink, Router } from '@angular/router';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { Subject, takeUntil, finalize } from 'rxjs';
 import { ReportesService } from '../../services/reportes.service';
+import { AuthService } from '../../services/auth.service';
 import { LoggerService } from '../../services/logger.service';
 import { ReporteValidators } from '../../validators/reporte.validators';
 import { TipoServicio, PrioridadReporte, EstadoReporte, ReporteCreate } from '../../models/reporte.model';
@@ -15,9 +16,10 @@ import { TipoServicio, PrioridadReporte, EstadoReporte, ReporteCreate } from '..
   templateUrl: './nuevo-reporte.component.html',
   styles: []
 })
-export class NuevoReporteComponent implements OnDestroy {
+export class NuevoReporteComponent implements OnInit, OnDestroy {
   private fb = inject(FormBuilder);
   private reportesService = inject(ReportesService);
+  private authService = inject(AuthService);
   private logger = inject(LoggerService);
   private router = inject(Router);
   private destroy$ = new Subject<void>();
@@ -41,6 +43,10 @@ export class NuevoReporteComponent implements OnDestroy {
     this.logger.info('NuevoReporteComponent inicializado');
   }
 
+  ngOnInit(): void {
+    this.loadUserData();
+  }
+
   ngOnDestroy(): void {
     this.destroy$.next();
     this.destroy$.complete();
@@ -53,7 +59,9 @@ export class NuevoReporteComponent implements OnDestroy {
       direccion: ['', [Validators.required, ReporteValidators.direccion()]],
       comentarios: ['', [ReporteValidators.comentarios()]],
       ciudadanoNombre: ['', [Validators.required, ReporteValidators.nombreCiudadano()]],
+      ciudadanoApellidos: ['', [Validators.required, ReporteValidators.apellidos()]],
       ciudadanoEmail: ['', [Validators.required, ReporteValidators.email()]],
+      ciudadanoTelefono: ['', [Validators.required, ReporteValidators.telefono()]],
       evidencia: [null, [ReporteValidators.evidenciasFotograficas()]]
     });
   }
@@ -101,7 +109,9 @@ export class NuevoReporteComponent implements OnDestroy {
       comentarios: formData.comentarios?.trim() || '',
       ciudadanoId: this.generateTempUserId(),
       ciudadanoNombre: formData.ciudadanoNombre.trim(),
+      ciudadanoApellidos: formData.ciudadanoApellidos.trim(),
       ciudadanoEmail: formData.ciudadanoEmail.trim().toLowerCase(),
+      ciudadanoTelefono: formData.ciudadanoTelefono.trim(),
       estado: EstadoReporte.PENDIENTE,
       prioridad: this.calculatePriority(formData.tipoServicio),
       evidenciasFotograficas: this.selectedFile ? [] : undefined
@@ -158,8 +168,21 @@ export class NuevoReporteComponent implements OnDestroy {
     return errors;
   }
 
+  private loadUserData(): void {
+    const currentUser = this.authService.getCurrentUser();
+    if (currentUser) {
+      this.reporteForm.patchValue({
+        ciudadanoNombre: currentUser.nombre,
+        ciudadanoApellidos: currentUser.apellidos,
+        ciudadanoEmail: currentUser.email
+      });
+      this.logger.info('Datos de usuario cargados', { userId: currentUser.id });
+    }
+  }
+
   private generateTempUserId(): string {
-    return `temp_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+    const currentUser = this.authService.getCurrentUser();
+    return currentUser ? currentUser.id : `temp_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
   }
 
   getErrorMessage(fieldName: string): string {

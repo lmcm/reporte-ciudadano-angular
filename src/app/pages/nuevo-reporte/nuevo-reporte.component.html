@@ -44,16 +44,30 @@
         <!-- Información del Ciudadano -->
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
-            <label class="block text-sm font-medium text-slate-900 mb-1" for="ciudadano-nombre">Nombre Completo</label>
+            <label class="block text-sm font-medium text-slate-900 mb-1" for="ciudadano-nombre">Nombre(s)</label>
             <input 
               formControlName="ciudadanoNombre"
               class="w-full h-12 px-4 rounded-md border border-slate-300 focus:ring-2 focus:ring-blue-600 focus:border-blue-600 transition"
               [class.border-red-500]="hasError('ciudadanoNombre')"
               id="ciudadano-nombre" 
-              placeholder="Su nombre completo"
+              placeholder="Su nombre"
               type="text" />
             <p *ngIf="hasError('ciudadanoNombre')" class="text-red-500 text-xs mt-1">{{ getErrorMessage('ciudadanoNombre') }}</p>
           </div>
+          <div>
+            <label class="block text-sm font-medium text-slate-900 mb-1" for="ciudadano-apellidos">Apellidos</label>
+            <input 
+              formControlName="ciudadanoApellidos"
+              class="w-full h-12 px-4 rounded-md border border-slate-300 focus:ring-2 focus:ring-blue-600 focus:border-blue-600 transition"
+              [class.border-red-500]="hasError('ciudadanoApellidos')"
+              id="ciudadano-apellidos" 
+              placeholder="Sus apellidos"
+              type="text" />
+            <p *ngIf="hasError('ciudadanoApellidos')" class="text-red-500 text-xs mt-1">{{ getErrorMessage('ciudadanoApellidos') }}</p>
+          </div>
+        </div>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
             <label class="block text-sm font-medium text-slate-900 mb-1" for="ciudadano-email">Correo Electrónico</label>
             <input 
@@ -64,6 +78,18 @@
               placeholder="su.email@ejemplo.com"
               type="email" />
             <p *ngIf="hasError('ciudadanoEmail')" class="text-red-500 text-xs mt-1">{{ getErrorMessage('ciudadanoEmail') }}</p>
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-slate-900 mb-1" for="ciudadano-telefono">Teléfono Celular</label>
+            <input 
+              formControlName="ciudadanoTelefono"
+              class="w-full h-12 px-4 rounded-md border border-slate-300 focus:ring-2 focus:ring-blue-600 focus:border-blue-600 transition"
+              [class.border-red-500]="hasError('ciudadanoTelefono')"
+              id="ciudadano-telefono" 
+              placeholder="1234567890"
+              type="tel" 
+              maxlength="10" />
+            <p *ngIf="hasError('ciudadanoTelefono')" class="text-red-500 text-xs mt-1">{{ getErrorMessage('ciudadanoTelefono') }}</p>
           </div>
         </div>
         

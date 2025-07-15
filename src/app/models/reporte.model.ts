@@ -11,7 +11,9 @@ export interface Reporte {
   fechaActualizacion: Timestamp | Date;
   ciudadanoId: string;
   ciudadanoNombre: string;
+  ciudadanoApellidos: string;
   ciudadanoEmail: string;
+  ciudadanoTelefono: string;
   evidenciasFotograficas?: string[];
   personalAsignado?: string;
   prioridad: PrioridadReporte;
@@ -37,7 +39,9 @@ export interface ReporteUpdate {
   estado?: EstadoReporte;
   fechaActualizacion?: Timestamp | Date | FieldValue;
   ciudadanoNombre?: string;
+  ciudadanoApellidos?: string;
   ciudadanoEmail?: string;
+  ciudadanoTelefono?: string;
   evidenciasFotograficas?: string[];
   personalAsignado?: string;
   prioridad?: PrioridadReporte;
