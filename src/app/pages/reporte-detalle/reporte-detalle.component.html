@@ -60,103 +60,161 @@
           <p class="text-slate-600 mt-1">Vea y gestione los detalles de esta solicitud de servicio.</p>
         </div>
         
-        <form (ngSubmit)="guardarCambios()" class="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
+        <!-- Estado de carga -->
+        <div *ngIf="loading" class="flex justify-center items-center py-12">
+          <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
+          <span class="ml-3 text-slate-600">Cargando reporte...</span>
+        </div>
+        
+        <!-- Error -->
+        <div *ngIf="error" class="bg-red-50 border border-red-200 rounded-lg p-4 mb-4">
+          <div class="flex items-center">
+            <svg class="h-5 w-5 text-red-400 mr-2" fill="currentColor" viewBox="0 0 20 20">
+              <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"></path>
+            </svg>
+            <span class="text-red-800 text-sm">{{ error }}</span>
+          </div>
+          <button (click)="volver()" class="mt-4 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
+            Volver a Mis Reportes
+          </button>
+        </div>
+        
+        <!-- Contenido del reporte -->
+        <div *ngIf="reporte && !loading && !error" class="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
           <div>
-            <label class="block text-sm font-medium text-slate-900 pb-1.5" for="report-id">ID de Reporte</label>
-            <input class="form-input w-full rounded-md border-slate-300 bg-gray-50 text-slate-900 focus:ring-blue-600 focus:border-blue-600" disabled id="report-id" type="text" [value]="reporteId" />
+            <label class="block text-sm font-medium text-slate-900 pb-1.5">ID de Reporte</label>
+            <input class="form-input w-full rounded-md border-slate-300 bg-gray-50 text-slate-900" disabled [value]="reporteId" />
           </div>
           
           <div>
-            <label class="block text-sm font-medium text-slate-900 pb-1.5" for="report-date">Fecha del Reporte</label>
-            <input class="form-input w-full rounded-md border-slate-300 bg-gray-50 text-slate-900 focus:ring-blue-600 focus:border-blue-600" disabled id="report-date" type="text" [value]="reporte.fecha" />
+            <label class="block text-sm font-medium text-slate-900 pb-1.5">Fecha del Reporte</label>
+            <input class="form-input w-full rounded-md border-slate-300 bg-gray-50 text-slate-900" disabled [value]="formatearFecha(reporte.fechaCreacion)" />
           </div>
           
           <div>
-            <label class="block text-sm font-medium text-slate-900 pb-1.5" for="report-type">Tipo de Reporte</label>
-            <input class="form-input w-full rounded-md border-slate-300 bg-gray-50 text-slate-900 focus:ring-blue-600 focus:border-blue-600" disabled id="report-type" type="text" [value]="reporte.tipo" />
+            <label class="block text-sm font-medium text-slate-900 pb-1.5">Tipo de Reporte</label>
+            <input class="form-input w-full rounded-md border-slate-300 bg-gray-50 text-slate-900" disabled [value]="getTipoServicioText(reporte.tipoServicio)" />
           </div>
           
           <div>
-            <label class="block text-sm font-medium text-slate-900 pb-1.5" for="location">Ubicación</label>
-            <input class="form-input w-full rounded-md border-slate-300 bg-gray-50 text-slate-900 focus:ring-blue-600 focus:border-blue-600" disabled id="location" type="text" [value]="reporte.ubicacion" />
+            <label class="block text-sm font-medium text-slate-900 pb-1.5">Estado</label>
+            <input class="form-input w-full rounded-md border-slate-300 bg-gray-50 text-slate-900" disabled [value]="getStatusText(reporte.estado)" />
           </div>
           
           <div class="md:col-span-2">
-            <label class="block text-sm font-medium text-slate-900 pb-1.5" for="description">Descripción</label>
-            <textarea class="form-textarea w-full rounded-md border-slate-300 bg-gray-50 text-slate-900 focus:ring-blue-600 focus:border-blue-600" disabled id="description" rows="4">{{ reporte.descripcion }}</textarea>
+            <label class="block text-sm font-medium text-slate-900 pb-1.5">Dirección</label>
+            <input class="form-input w-full rounded-md border-slate-300 bg-gray-50 text-slate-900" disabled [value]="reporte.direccion" />
           </div>
           
-          <hr class="md:col-span-2 my-2" />
-          
-          <div>
-            <label class="block text-sm font-medium text-slate-900 pb-1.5" for="status">Estado</label>
-            <select [(ngModel)]="reporte.estado" name="estado" class="form-select w-full rounded-md border-slate-300 text-slate-900 focus:ring-blue-600 focus:border-blue-600" id="status">
-              <option value="Recibido">Recibido</option>
-              <option value="En Progreso">En Progreso</option>
-              <option value="Completado">Completado</option>
-              <option value="Cancelado">Cancelado</option>
-            </select>
+          <div class="md:col-span-2">
+            <label class="block text-sm font-medium text-slate-900 pb-1.5">Descripción/Comentarios</label>
+            <textarea class="form-textarea w-full rounded-md border-slate-300 bg-gray-50 text-slate-900" disabled rows="4">{{ reporte.comentarios }}</textarea>
           </div>
           
           <div>
-            <label class="block text-sm font-medium text-slate-900 pb-1.5" for="assigned-personnel">Personal Asignado</label>
-            <select [(ngModel)]="reporte.personalAsignado" name="personalAsignado" class="form-select w-full rounded-md border-slate-300 text-slate-900 focus:ring-blue-600 focus:border-blue-600" id="assigned-personnel">
-              <option value="">Sin Asignar</option>
-              <option value="Equipo de Obras Públicas A">Equipo de Obras Públicas A</option>
-              <option value="Equipo de Obras Públicas B">Equipo de Obras Públicas B</option>
-              <option value="Servicios de Contratista">Servicios de Contratista</option>
-            </select>
+            <label class="block text-sm font-medium text-slate-900 pb-1.5">Ciudadano</label>
+            <input class="form-input w-full rounded-md border-slate-300 bg-gray-50 text-slate-900" disabled [value]="reporte.ciudadanoNombre + ' ' + reporte.ciudadanoApellidos" />
           </div>
           
-          <div class="md:col-span-2 mt-8 flex justify-end">
-            <button class="inline-flex items-center justify-center rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:ring-offset-2" type="submit">
-              <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
-                <path d="M7.707 10.293a1 1 0 10-1.414 1.414l3 3a1 1 0 001.414 0l3-3a1 1 0 00-1.414-1.414L11 11.586V6h5a2 2 0 012 2v6a2 2 0 01-2 2H4a2 2 0 01-2-2V8a2 2 0 012-2h5v5.586l-1.293-1.293zM9 4a1 1 0 012 0v2H9V4z"></path>
-              </svg>
-              Guardar Cambios
+          <div>
+            <label class="block text-sm font-medium text-slate-900 pb-1.5">Email</label>
+            <input class="form-input w-full rounded-md border-slate-300 bg-gray-50 text-slate-900" disabled [value]="reporte.ciudadanoEmail" />
+          </div>
+          
+          <div *ngIf="reporte.ciudadanoTelefono">
+            <label class="block text-sm font-medium text-slate-900 pb-1.5">Teléfono</label>
+            <input class="form-input w-full rounded-md border-slate-300 bg-gray-50 text-slate-900" disabled [value]="reporte.ciudadanoTelefono" />
+          </div>
+          
+          <div>
+            <label class="block text-sm font-medium text-slate-900 pb-1.5">Prioridad</label>
+            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium"
+                  [ngClass]="{
+                    'bg-red-100 text-red-800': reporte.prioridad === 'critica',
+                    'bg-orange-100 text-orange-800': reporte.prioridad === 'alta',
+                    'bg-yellow-100 text-yellow-800': reporte.prioridad === 'media',
+                    'bg-green-100 text-green-800': reporte.prioridad === 'baja'
+                  }">
+              {{ reporte.prioridad | titlecase }}
+            </span>
+          </div>
+          
+          <div class="md:col-span-2 mt-8 flex justify-between">
+            <button (click)="volver()" class="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50">
+              ← Volver a Mis Reportes
             </button>
           </div>
-        </form>
+        </div>
+        
       </div>
       
-      <div class="bg-white rounded-lg shadow-md p-6 md:p-8 mt-8">
+      <!-- Historial de Actualizaciones -->
+      <div *ngIf="reporte && !loading && !error" class="bg-white rounded-lg shadow-md p-6 md:p-8 mt-8">
         <h3 class="text-xl font-bold tracking-tight mb-4">Historial de Actualizaciones</h3>
         <div class="border-l-2 border-gray-200 ml-2">
-          <div *ngFor="let update of historial" class="relative pl-8 pb-8">
+          <div class="relative pl-8 pb-8">
+            <div class="absolute left-[-9px] top-[5px] h-4 w-4 rounded-full bg-green-500"></div>
+            <p class="font-semibold text-gray-800">{{ getStatusText(reporte.estado) }}</p>
+            <p class="text-sm text-gray-500">{{ formatearFecha(reporte.fechaActualizacion || reporte.fechaCreacion) }}</p>
+          </div>
+          <div class="relative pl-8 pb-8">
             <div class="absolute left-[-9px] top-[5px] h-4 w-4 rounded-full bg-blue-500"></div>
-            <p class="font-semibold text-gray-800">{{ update.estado }}</p>
-            <p class="text-sm text-gray-500">{{ update.fecha }}</p>
+            <p class="font-semibold text-gray-800">Reporte Creado</p>
+            <p class="text-sm text-gray-500">{{ formatearFecha(reporte.fechaCreacion) }}</p>
           </div>
         </div>
       </div>
       
-      <div class="bg-white rounded-lg shadow-md p-6 md:p-8 mt-8">
+      <!-- Comentarios -->
+      <div *ngIf="reporte && !loading && !error" class="bg-white rounded-lg shadow-md p-6 md:p-8 mt-8">
         <h3 class="text-xl font-bold tracking-tight mb-6">Comentarios</h3>
-        <div class="space-y-6">
+        
+        <!-- Estado de carga comentarios -->
+        <div *ngIf="loadingComentarios" class="flex justify-center py-4">
+          <div class="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-500"></div>
+          <span class="ml-2 text-slate-600">Cargando comentarios...</span>
+        </div>
+        
+        <!-- Lista de comentarios -->
+        <div *ngIf="!loadingComentarios" class="space-y-6">
+          <div *ngIf="comentarios.length === 0" class="text-center py-8 text-slate-500">
+            <p>No hay comentarios aún. Sé el primero en comentar.</p>
+          </div>
+          
           <div *ngFor="let comentario of comentarios" class="flex gap-4">
-            <div class="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-10" [style.background-image]="'url(' + comentario.avatar + ')'"></div>
+            <div class="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-10"
+                 [style.background-image]="'url(https://lh3.googleusercontent.com/aida-public/AB6AXuBvh128m3DzLuKW4KCOM62eraXokcfuAyF6uulYQGryNaAo5u4y-x9OypSGClwOMEVLGfgDI-T0WLEhZxZhU9ZE_AcWyaiYM64L6K60Q-FbsdGvu6ANblwwLnX74wHsoEH3jKme7EKfYKQU9GEVxPrwcI-WDPa_SM5B4jNXavYgpoRXUuPSPNrA3AwbyZcjZjVCAgLUYg-T48-rwM9mqlrz4fUthbsf48LcA7N7I_2CtChqSGREXmUPjAbWoowJTvwa5t3_PcfTDcD8)'">
+            </div>
             <div class="flex-1">
               <div class="flex items-center justify-between">
-                <p class="font-semibold text-gray-900">{{ comentario.autor }}</p>
-                <p class="text-sm text-gray-500">{{ comentario.fecha }}</p>
+                <p class="font-semibold text-gray-900">{{ formatearNombreCorto(comentario.autorNombre) }} ({{ getTipoAutorText(comentario.autorTipo) }})</p>
+                <p class="text-sm text-gray-500">{{ formatearFecha(comentario.fechaCreacion) }}</p>
               </div>
               <p class="text-gray-700 mt-1">{{ comentario.texto }}</p>
             </div>
           </div>
         </div>
         
-        <div class="mt-8">
+        <!-- Formulario para nuevo comentario -->
+        <div *ngIf="!loadingComentarios" class="mt-8">
           <h4 class="text-lg font-semibold mb-3">Agregar un comentario</h4>
           <div class="flex gap-4">
-            <div class="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-10" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuBvh128m3DzLuKW4KCOM62eraXokcfuAyF6uulYQGryNaAo5u4y-x9OypSGClwOMEVLGfgDI-T0WLEhZxZhU9ZE_AcWyaiYM64L6K60Q-FbsdGvu6ANblwwLnX74wHsoEH3jKme7EKfYKQU9GEVxPrwcI-WDPa_SM5B4jNXavYgpoRXUuPSPNrA3AwbyZcjZjVCAgLUYg-T48-rwM9mqlrz4fUthbsf48LcA7N7I_2CtChqSGREXmUPjAbWoowJTvwa5t3_PcfTDcD8");'></div>
+            <div class="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-10" 
+                 style='background-image: url("https://ui-avatars.com/api/?name=Usuario&background=0c7ff2&color=fff")'>
+            </div>
             <div class="flex-1">
-              <textarea [(ngModel)]="nuevoComentario" class="form-textarea w-full rounded-md border-slate-300 text-slate-900 focus:ring-blue-600 focus:border-blue-600" placeholder="Escribe tu comentario aquí..." rows="3"></textarea>
+              <textarea 
+                [(ngModel)]="nuevoComentario"
+                placeholder="Escribe tu comentario aquí..."
+                class="form-textarea w-full rounded-md border-gray-300 focus:ring-blue-500 focus:border-blue-500"
+                rows="3"></textarea>
               <div class="mt-3 flex justify-end">
-                <button (click)="enviarComentario()" class="inline-flex items-center justify-center rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:ring-offset-2" type="button">
-                  <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M10.894 2.553a1 1 0 00-1.788 0l-7 14a1 1 0 001.169 1.409l5-1.429A1 1 0 009 15.571V11a1 1 0 112 0v4.571a1 1 0 00.725.962l5 1.428a1 1 0 001.17-1.408l-7-14z"></path>
-                  </svg>
-                  Enviar Comentario
+                <button 
+                  (click)="enviarComentario()"
+                  [disabled]="!nuevoComentario.trim() || enviandoComentario"
+                  class="inline-flex items-center justify-center rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed">
+                  <span *ngIf="enviandoComentario" class="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></span>
+                  {{ enviandoComentario ? 'Enviando...' : 'Enviar Comentario' }}
                 </button>
               </div>
             </div>
@@ -165,10 +223,4 @@
       </div>
     </div>
   </main>
-  
-  <footer class="bg-white">
-    <div class="container mx-auto px-4 sm:px-6 lg:px-8 py-4 text-center text-sm text-gray-500">
-      <p>© 2024 CityConnect - H. Ayuntamiento de Boca del Río, Veracruz. Todos los derechos reservados.</p>
-    </div>
-  </footer>
 </div>

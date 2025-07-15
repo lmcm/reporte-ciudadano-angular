@@ -1,6 +1,6 @@
 import { Injectable, inject } from '@angular/core';
 import { Observable, from, throwError, BehaviorSubject } from 'rxjs';
-import { map, catchError, tap } from 'rxjs/operators';
+import { map, catchError, tap, switchMap } from 'rxjs/operators';
 import {
   collection,
   doc,
@@ -54,6 +54,19 @@ export class ReportesService {
     this.logger.info('ReportesService inicializado');
   }
 
+  // Generar folio consecutivo
+  private async generarFolio(): Promise<string> {
+    const year = new Date().getFullYear();
+    const q = query(
+      collection(this.db, this.COLLECTION_NAME),
+      where('activo', '==', true)
+    );
+    
+    const querySnapshot = await getDocs(q);
+    const count = querySnapshot.size + 1;
+    return `#${year}${count.toString().padStart(4, '0')}`;
+  }
+
   // Crear nuevo reporte
   crearReporte(reporte: ReporteCreate): Observable<string> {
     this.logger.info('Creando nuevo reporte', { 
@@ -61,24 +74,29 @@ export class ReportesService {
       ciudadanoId: reporte.ciudadanoId 
     });
     
-    const reporteData = {
-      ...reporte,
-      fechaCreacion: serverTimestamp(),
-      fechaActualizacion: serverTimestamp(),
-      activo: true
-    };
+    return from(this.generarFolio()).pipe(
+      switchMap(folio => {
+        const reporteData = {
+          ...reporte,
+          folio,
+          fechaCreacion: serverTimestamp(),
+          fechaActualizacion: serverTimestamp(),
+          activo: true
+        };
 
-    return from(addDoc(collection(this.db, this.COLLECTION_NAME), reporteData))
-      .pipe(
-        map(docRef => {
-          this.logger.info('Reporte creado exitosamente', { reporteId: docRef.id });
-          return docRef.id;
-        }),
-        catchError(error => {
-          this.logger.error('Error al crear reporte', { error, reporteData });
-          return throwError(() => this.firebaseService.handleFirebaseError(error));
-        })
-      );
+        return from(addDoc(collection(this.db, this.COLLECTION_NAME), reporteData))
+          .pipe(
+            map(docRef => {
+              this.logger.info('Reporte creado exitosamente', { reporteId: docRef.id, folio });
+              return docRef.id;
+            })
+          );
+      }),
+      catchError(error => {
+        this.logger.error('Error al crear reporte', { error });
+        return throwError(() => this.firebaseService.handleFirebaseError(error));
+      })
+    );
   }
 
   // Obtener reporte por ID
@@ -290,6 +308,40 @@ export class ReportesService {
       personalAsignado: personalId,
       estado: EstadoReporte.EN_PROGRESO 
     });
+  }
+
+  // Obtener todos los reportes (para admin)
+  obtenerTodosLosReportes(): Observable<Reporte[]> {
+    this.logger.debug('Obteniendo todos los reportes para admin');
+    
+    const q = query(
+      collection(this.db, this.COLLECTION_NAME),
+      where('activo', '==', true)
+    );
+
+    return from(getDocs(q))
+      .pipe(
+        map(querySnapshot => {
+          const reportes: Reporte[] = [];
+          querySnapshot.forEach(doc => {
+            reportes.push({ id: doc.id, ...doc.data() } as Reporte);
+          });
+          
+          // Ordenar manualmente por fecha de creación (más reciente primero)
+          reportes.sort((a, b) => {
+            const dateA = a.fechaCreacion instanceof Date ? a.fechaCreacion : new Date(a.fechaCreacion as any);
+            const dateB = b.fechaCreacion instanceof Date ? b.fechaCreacion : new Date(b.fechaCreacion as any);
+            return dateB.getTime() - dateA.getTime();
+          });
+          
+          this.logger.debug('Todos los reportes obtenidos', { count: reportes.length });
+          return reportes;
+        }),
+        catchError(error => {
+          this.logger.error('Error al obtener todos los reportes', { error });
+          return throwError(() => this.firebaseService.handleFirebaseError(error));
+        })
+      );
   }
 
   // Obtener estadísticas

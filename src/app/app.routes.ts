@@ -28,7 +28,7 @@ export const routes: Routes = [
   { 
     path: 'admin-panel', 
     loadComponent: () => import('./pages/admin-panel/admin-panel.component').then(m => m.AdminPanelComponent),
-    canActivate: [authGuard]
+   // canActivate: [authGuard]
   },
   { 
     path: 'reporte-detalle/:id', 

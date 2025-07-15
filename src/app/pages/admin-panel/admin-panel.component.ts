@@ -1,6 +1,9 @@
-import { Component } from '@angular/core';
-import { RouterLink } from '@angular/router';
+import { Component, OnInit, OnDestroy, inject } from '@angular/core';
+import { Router, RouterLink } from '@angular/router';
 import { CommonModule } from '@angular/common';
+import { Subject, takeUntil } from 'rxjs';
+import { ReportesService } from '../../services/reportes.service';
+import { Reporte, EstadoReporte, TipoServicio } from '../../models/reporte.model';
 
 @Component({
   selector: 'app-admin-panel',
@@ -9,32 +12,119 @@ import { CommonModule } from '@angular/common';
   templateUrl: './admin-panel.component.html',
   styles: []
 })
-export class AdminPanelComponent {
-  reportes = [
-    { id: 1, folio: '#20240001', tipo: 'Reparación de luminaria', estado: 'En Progreso', fecha: '2024-01-15' },
-    { id: 2, folio: '#20240002', tipo: 'Fuga de agua', estado: 'Completado', fecha: '2024-01-16' },
-    { id: 3, folio: '#20240003', tipo: 'Recolección de basura', estado: 'Pendiente', fecha: '2024-01-17' },
-    { id: 4, folio: '#20240004', tipo: 'Reparación de baches', estado: 'En Progreso', fecha: '2024-01-18' },
-    { id: 5, folio: '#20240005', tipo: 'Reparación de luminaria', estado: 'Completado', fecha: '2024-01-19' },
-    { id: 6, folio: '#20240006', tipo: 'Fuga de agua', estado: 'Pendiente', fecha: '2024-01-20' },
-    { id: 7, folio: '#20240007', tipo: 'Recolección de basura', estado: 'En Progreso', fecha: '2024-01-21' },
-    { id: 8, folio: '#20240008', tipo: 'Reparación de baches', estado: 'Completado', fecha: '2024-01-22' }
-  ];
+export class AdminPanelComponent implements OnInit, OnDestroy {
+  private destroy$ = new Subject<void>();
+  private reportesService = inject(ReportesService);
+  private router = inject(Router);
+  
+  reportes: Reporte[] = [];
+  loading = true;
+  error: string | null = null;
 
-  getStatusClass(estado: string): string {
+  ngOnInit() {
+    this.cargarReportes();
+  }
+
+  ngOnDestroy() {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
+
+  private cargarReportes() {
+    this.loading = true;
+    this.error = null;
+    
+    this.reportesService.obtenerTodosLosReportes()
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (reportes) => {
+          this.reportes = reportes.sort((a, b) => {
+            const dateA = a.fechaCreacion instanceof Date ? a.fechaCreacion : new Date(a.fechaCreacion as any);
+            const dateB = b.fechaCreacion instanceof Date ? b.fechaCreacion : new Date(b.fechaCreacion as any);
+            return dateB.getTime() - dateA.getTime(); // Más reciente primero
+          });
+          this.loading = false;
+        },
+        error: (error) => {
+          this.error = 'Error al cargar reportes: ' + error;
+          this.loading = false;
+        }
+      });
+  }
+
+  getStatusClass(estado: EstadoReporte): string {
     switch (estado) {
-      case 'Pendiente':
+      case EstadoReporte.PENDIENTE:
         return 'bg-yellow-100 text-yellow-800';
-      case 'En Progreso':
+      case EstadoReporte.EN_PROGRESO:
         return 'bg-blue-100 text-blue-800';
-      case 'Completado':
+      case EstadoReporte.COMPLETADO:
         return 'bg-green-100 text-green-800';
+      case EstadoReporte.CANCELADO:
+        return 'bg-red-100 text-red-800';
       default:
         return 'bg-gray-100 text-gray-800';
     }
   }
 
-  verDetalle(id: number) {
-    console.log('Ver detalle del reporte:', id);
+  getStatusText(estado: EstadoReporte): string {
+    switch (estado) {
+      case EstadoReporte.PENDIENTE:
+        return 'Pendiente';
+      case EstadoReporte.EN_PROGRESO:
+        return 'En Progreso';
+      case EstadoReporte.COMPLETADO:
+        return 'Completado';
+      case EstadoReporte.CANCELADO:
+        return 'Cancelado';
+      default:
+        return 'Desconocido';
+    }
+  }
+
+  getTipoServicioText(tipo: TipoServicio): string {
+    switch (tipo) {
+      case TipoServicio.LAMPARA:
+        return 'Reparación de luminaria';
+      case TipoServicio.BACHE:
+        return 'Reparación de baches';
+      case TipoServicio.FUGA_AGUA:
+        return 'Fuga de agua';
+      case TipoServicio.BASURA:
+        return 'Recolección de basura';
+      case TipoServicio.OTRO:
+        return 'Otro';
+      default:
+        return 'Desconocido';
+    }
+  }
+
+  formatearFecha(fecha: any): string {
+    if (!fecha) return 'Sin fecha';
+    
+    let date: Date;
+    if (fecha.toDate) {
+      date = fecha.toDate();
+    } else if (fecha instanceof Date) {
+      date = fecha;
+    } else {
+      date = new Date(fecha);
+    }
+    
+    return date.toLocaleDateString('es-MX');
+  }
+
+  formatearNombreCorto(nombreCompleto: string): string {
+    const palabras = nombreCompleto.trim().split(' ');
+    if (palabras.length >= 2) {
+      const primerNombre = palabras[0].charAt(0).toUpperCase() + palabras[0].slice(1).toLowerCase();
+      const primerApellido = palabras[1].charAt(0).toUpperCase() + palabras[1].slice(1).toLowerCase();
+      return `${primerNombre} ${primerApellido}`;
+    }
+    return palabras[0].charAt(0).toUpperCase() + palabras[0].slice(1).toLowerCase();
+  }
+
+  verDetalle(reporteId: string) {
+    this.router.navigate(['/reporte-detalle', reporteId]);
   }
 }

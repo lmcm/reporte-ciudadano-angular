@@ -2,6 +2,7 @@ import { Timestamp, FieldValue } from 'firebase/firestore';
 
 export interface Reporte {
   id?: string;
+  folio?: string;
   tipoServicio: TipoServicio;
   direccion: string;
   coordenadas?: Coordenadas;

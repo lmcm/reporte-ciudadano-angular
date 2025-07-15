@@ -58,11 +58,28 @@
       </div>
       
       <div class="overflow-x-auto rounded-lg border border-slate-200 bg-white shadow-sm">
-        <table class="w-full text-left text-sm text-slate-700">
+        <!-- Estado de carga -->
+        <div *ngIf="loading" class="flex justify-center items-center py-12">
+          <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
+          <span class="ml-3 text-slate-600">Cargando reportes...</span>
+        </div>
+        
+        <!-- Error -->
+        <div *ngIf="error" class="bg-red-50 border border-red-200 rounded-lg p-4 mb-4">
+          <div class="flex items-center">
+            <svg class="h-5 w-5 text-red-400 mr-2" fill="currentColor" viewBox="0 0 20 20">
+              <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"></path>
+            </svg>
+            <span class="text-red-800 text-sm">{{ error }}</span>
+          </div>
+        </div>
+        
+        <table *ngIf="!loading && !error" class="w-full text-left text-sm text-slate-700">
           <thead class="bg-slate-50 text-xs uppercase text-slate-500">
             <tr>
               <th class="px-6 py-3 font-medium" scope="col">Folio</th>
               <th class="px-6 py-3 font-medium" scope="col">Tipo de Servicio</th>
+              <th class="px-6 py-3 font-medium" scope="col">Ciudadano</th>
               <th class="px-6 py-3 font-medium" scope="col">Estado</th>
               <th class="px-6 py-3 font-medium" scope="col">Fecha de Creación</th>
               <th class="px-6 py-3 font-medium text-center" scope="col">Acciones</th>
@@ -70,17 +87,18 @@
           </thead>
           <tbody>
             <tr *ngFor="let reporte of reportes" class="border-b border-slate-200 bg-white hover:bg-slate-50">
-              <td class="px-6 py-4 font-medium text-slate-900">{{ reporte.folio }}</td>
-              <td class="px-6 py-4">{{ reporte.tipo }}</td>
+              <td class="px-6 py-4 font-medium text-slate-900">{{ reporte.folio || 'Sin folio' }}</td>
+              <td class="px-6 py-4">{{ getTipoServicioText(reporte.tipoServicio) }}</td>
+              <td class="px-6 py-4">{{ formatearNombreCorto(reporte.ciudadanoNombre + ' ' + reporte.ciudadanoApellidos) }}</td>
               <td class="px-6 py-4">
                 <span [ngClass]="getStatusClass(reporte.estado)" class="px-3 py-1 rounded-full text-xs font-medium">
-                  {{ reporte.estado }}
+                  {{ getStatusText(reporte.estado) }}
                 </span>
               </td>
-              <td class="px-6 py-4 text-slate-600">{{ reporte.fecha }}</td>
+              <td class="px-6 py-4 text-slate-600">{{ formatearFecha(reporte.fechaCreacion) }}</td>
               <td class="px-6 py-4 text-center">
                 <button 
-                  (click)="verDetalle(reporte.id)"
+                  (click)="verDetalle(reporte.id!)"
                   class="text-sm font-medium text-blue-600 hover:underline">
                   Ver Detalles
                 </button>
