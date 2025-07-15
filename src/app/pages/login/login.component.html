@@ -27,15 +27,37 @@
       <div class="w-full max-w-md space-y-8">
         <div class="text-center">
           <h2 class="text-3xl font-extrabold text-slate-900 tracking-tight">
-            Bienvenido a Boca del Río
+            {{ isLoginMode ? 'Iniciar Sesión' : 'Crear Cuenta' }}
           </h2>
           <p class="mt-2 text-md text-slate-600">
-            Reporta problemas, sigue tus solicitudes y conecta con tu ayuntamiento.
+            {{ isLoginMode ? 'Accede a tu cuenta para gestionar tus reportes' : 'Regístrate para reportar problemas en tu comunidad' }}
           </p>
         </div>
         
         <div class="mt-8 space-y-6 rounded-lg bg-white p-8 shadow-lg">
+          <div *ngIf="error" class="bg-red-50 border border-red-200 rounded-md p-4">
+            <div class="flex">
+              <svg class="h-5 w-5 text-red-400" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"></path>
+              </svg>
+              <div class="ml-3">
+                <p class="text-sm text-red-800">{{ error }}</p>
+              </div>
+            </div>
+          </div>
+
           <form (ngSubmit)="onSubmit()" class="space-y-4">
+            <div *ngIf="!isLoginMode">
+              <label class="sr-only" for="nombre">Nombre completo</label>
+              <input 
+                [(ngModel)]="nombre" 
+                name="nombre"
+                class="form-input block w-full appearance-none rounded-md border border-slate-300 bg-slate-50 px-4 py-3 placeholder-slate-400 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-blue-500 sm:text-sm"
+                id="nombre" 
+                placeholder="Nombre completo" 
+                required 
+                type="text" />
+            </div>
             <div>
               <label class="sr-only" for="email">Correo electrónico</label>
               <input 
@@ -54,24 +76,19 @@
                 name="password"
                 class="form-input block w-full appearance-none rounded-md border border-slate-300 bg-slate-50 px-4 py-3 placeholder-slate-400 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-blue-500 sm:text-sm"
                 id="password" 
-                placeholder="Contraseña" 
+                placeholder="Contraseña (mínimo 6 caracteres)" 
                 required
+                minlength="6"
                 type="password" />
-            </div>
-            
-            <div class="flex items-center justify-between">
-              <div class="text-sm">
-                <a class="font-medium text-blue-600 hover:text-blue-700" href="#">
-                  ¿Olvidaste tu contraseña?
-                </a>
-              </div>
             </div>
             
             <div>
               <button
-                class="group relative flex w-full justify-center rounded-md border border-transparent bg-blue-600 px-4 py-3 text-sm font-semibold text-white shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                [disabled]="loading"
+                class="group relative flex w-full justify-center rounded-md border border-transparent bg-blue-600 px-4 py-3 text-sm font-semibold text-white shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
                 type="submit">
-                Iniciar Sesión
+                <div *ngIf="loading" class="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                {{ loading ? 'Procesando...' : (isLoginMode ? 'Iniciar Sesión' : 'Crear Cuenta') }}
               </button>
             </div>
           </form>
@@ -86,10 +103,12 @@
           </div>
           
           <div class="space-y-4">
-            <a class="flex w-full justify-center rounded-md border border-slate-300 bg-white px-4 py-3 text-sm font-medium text-slate-600 shadow-sm hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-slate-400 focus:ring-offset-2" href="#">
-              ¿No tienes cuenta? Regístrate
-            </a>
-            <a class="flex w-full justify-center rounded-md border border-transparent bg-slate-100 px-4 py-3 text-sm font-medium text-slate-600 shadow-sm hover:bg-slate-200 focus:outline-none focus:ring-2 focus:ring-slate-400 focus:ring-offset-2" href="#">
+            <button 
+              (click)="toggleMode()"
+              class="flex w-full justify-center rounded-md border border-slate-300 bg-white px-4 py-3 text-sm font-medium text-slate-600 shadow-sm hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-slate-400 focus:ring-offset-2">
+              {{ isLoginMode ? '¿No tienes cuenta? Regístrate' : '¿Ya tienes cuenta? Inicia sesión' }}
+            </button>
+            <a routerLink="/inicio" class="flex w-full justify-center rounded-md border border-transparent bg-slate-100 px-4 py-3 text-sm font-medium text-slate-600 shadow-sm hover:bg-slate-200 focus:outline-none focus:ring-2 focus:ring-slate-400 focus:ring-offset-2">
               Continuar como invitado
             </a>
           </div>

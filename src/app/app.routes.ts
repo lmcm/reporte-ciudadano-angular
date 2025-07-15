@@ -1,4 +1,5 @@
 import { Routes } from '@angular/router';
+import { authGuard } from './guards/auth.guard';
 
 export const routes: Routes = [
   { path: '', redirectTo: '/inicio', pathMatch: 'full' },
@@ -12,7 +13,8 @@ export const routes: Routes = [
   },
   { 
     path: 'nuevo-reporte', 
-    loadComponent: () => import('./pages/nuevo-reporte/nuevo-reporte.component').then(m => m.NuevoReporteComponent) 
+    loadComponent: () => import('./pages/nuevo-reporte/nuevo-reporte.component').then(m => m.NuevoReporteComponent),
+    canActivate: [authGuard]
   },
   { 
     path: 'consulta-reporte', 
@@ -20,19 +22,23 @@ export const routes: Routes = [
   },
   { 
     path: 'mis-reportes', 
-    loadComponent: () => import('./pages/mis-reportes/mis-reportes.component').then(m => m.MisReportesComponent) 
+    loadComponent: () => import('./pages/mis-reportes/mis-reportes.component').then(m => m.MisReportesComponent),
+    canActivate: [authGuard]
   },
   { 
     path: 'admin-panel', 
-    loadComponent: () => import('./pages/admin-panel/admin-panel.component').then(m => m.AdminPanelComponent) 
+    loadComponent: () => import('./pages/admin-panel/admin-panel.component').then(m => m.AdminPanelComponent),
+    canActivate: [authGuard]
   },
   { 
     path: 'reporte-detalle/:id', 
-    loadComponent: () => import('./pages/reporte-detalle/reporte-detalle.component').then(m => m.ReporteDetalleComponent) 
+    loadComponent: () => import('./pages/reporte-detalle/reporte-detalle.component').then(m => m.ReporteDetalleComponent),
+    canActivate: [authGuard]
   },
   { 
     path: 'servicios', 
-    loadComponent: () => import('./pages/servicios/servicios.component').then(m => m.ServiciosComponent) 
+    loadComponent: () => import('./pages/servicios/servicios.component').then(m => m.ServiciosComponent),
+    canActivate: [authGuard]
   },
   { path: '**', redirectTo: '/inicio' }
 ];

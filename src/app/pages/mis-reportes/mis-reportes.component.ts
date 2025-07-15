@@ -138,6 +138,11 @@ export class MisReportesComponent implements OnInit, OnDestroy {
     this.cargarMisReportes();
   }
 
+  logout() {
+    this.authService.logout();
+    this.router.navigate(['/login']);
+  }
+
   private escucharCambiosEnTiempoReal() {
     const userEmail = this.authService.getCurrentUserEmail();
     

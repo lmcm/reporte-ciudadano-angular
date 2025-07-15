@@ -1,0 +1,17 @@
+{
+  "hosting": {
+    "site": "reporte-ciudadano-boca-del-rio",
+    "public": "dist/reporte-ciudadano-angular",
+    "ignore": [
+      "firebase.json",
+      "**/.*",
+      "**/node_modules/**"
+    ],
+    "rewrites": [
+      {
+        "source": "**",
+        "destination": "/index.html"
+      }
+    ]
+  }
+}
