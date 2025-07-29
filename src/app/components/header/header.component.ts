@@ -22,4 +22,9 @@ export class HeaderComponent {
     this.authService.logout();
     this.router.navigate(['/login']);
   }
+
+  getUserName(): string {
+    const user = this.authService.getCurrentUser();
+    return user ? `${user.nombre} ${user.apellidos}` : 'Usuario';
+  }
 }

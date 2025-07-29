@@ -64,7 +64,7 @@
             <div class="flex items-center gap-6">
               <div class="relative">
                 <div class="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-24" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuCfOs-idp0qBCGjuGjXV6RK2nyFuwMM5xvm2BFG8nmEyd3hOdnT-Jg5I3ryQqnrnKzCek03JrOaIps0l1kz-SOs46_mxpn-86tLYHBsemHpam_Ux8mTXT_TZdgdqYGL3quAWlMLAgeMUeCVWZGTASwXJydX4Yc0Vc9AtGA0NVaek4NRX0jm92vNJoNeUmey7zhZcIH276prnNh9PUtNAzSHTl-Fl7vYa6PjFYQodh6U4q_RfFyo6Zkl7TPx4a5VWXM9fqWEDh8OZtw6');"></div>
-                <button class="absolute bottom-0 right-0 bg-blue-500 text-white rounded-full p-1.5 hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                <button (click)="toggleEditProfile()" class="absolute bottom-0 right-0 bg-blue-500 text-white rounded-full p-1.5 hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
                   <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                     <path d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.5L14.732 3.732z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
                   </svg>
@@ -74,6 +74,63 @@
                 <h2 class="text-2xl font-bold text-slate-800">{{ currentUser?.nombre || 'Usuario' }}</h2>
                 <p class="text-slate-500">Miembro desde {{ currentUser?.fechaRegistro | date:'yyyy' }}</p>
               </div>
+            </div>
+            
+            <!-- Formulario de edición -->
+            <div *ngIf="showEditForm" class="mt-6 pt-6 border-t border-slate-200">
+              <h3 class="text-lg font-semibold text-slate-800 mb-4">Editar información de contacto</h3>
+              <form [formGroup]="editForm" (ngSubmit)="saveProfile()" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label class="block text-sm font-medium text-slate-700 mb-1">Nombre</label>
+                  <input 
+                    formControlName="nombre"
+                    type="text" 
+                    class="w-full px-3 py-2 border border-slate-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                </div>
+                <div>
+                  <label class="block text-sm font-medium text-slate-700 mb-1">Apellidos</label>
+                  <input 
+                    formControlName="apellidos"
+                    type="text" 
+                    class="w-full px-3 py-2 border border-slate-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                </div>
+                <div>
+                  <label class="block text-sm font-medium text-slate-700 mb-1">Email</label>
+                  <input 
+                    formControlName="email"
+                    type="email" 
+                    class="w-full px-3 py-2 border border-slate-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                </div>
+                <div>
+                  <label class="block text-sm font-medium text-slate-700 mb-1">Teléfono</label>
+                  <input 
+                    formControlName="telefono"
+                    type="tel" 
+                    maxlength="10"
+                    class="w-full px-3 py-2 border border-slate-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                </div>
+                <div class="md:col-span-2">
+                  <label class="block text-sm font-medium text-slate-700 mb-1">Dirección</label>
+                  <input 
+                    formControlName="direccion"
+                    type="text" 
+                    class="w-full px-3 py-2 border border-slate-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                </div>
+                <div class="md:col-span-2 flex gap-3 justify-end">
+                  <button 
+                    type="button" 
+                    (click)="cancelEdit()"
+                    class="px-4 py-2 border border-slate-300 text-slate-700 rounded-md hover:bg-slate-50">
+                    Cancelar
+                  </button>
+                  <button 
+                    type="submit" 
+                    [disabled]="editForm.invalid || saving"
+                    class="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 disabled:opacity-50">
+                    {{ saving ? 'Guardando...' : 'Guardar cambios' }}
+                  </button>
+                </div>
+              </form>
             </div>
           </div>
           

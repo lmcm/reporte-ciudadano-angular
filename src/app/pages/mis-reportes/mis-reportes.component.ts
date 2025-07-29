@@ -1,6 +1,7 @@
 import { Component, OnInit, OnDestroy, inject } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import { CommonModule } from '@angular/common';
+import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { Subject, takeUntil } from 'rxjs';
 import { ReportesService } from '../../services/reportes.service';
 import { AuthService } from '../../services/auth.service';
@@ -9,7 +10,7 @@ import { Reporte, EstadoReporte, TipoServicio } from '../../models/reporte.model
 @Component({
   selector: 'app-mis-reportes',
   standalone: true,
-  imports: [RouterLink, CommonModule],
+  imports: [RouterLink, CommonModule, ReactiveFormsModule],
   templateUrl: './mis-reportes.component.html',
   styles: []
 })
@@ -18,15 +19,30 @@ export class MisReportesComponent implements OnInit, OnDestroy {
   private reportesService = inject(ReportesService);
   private authService = inject(AuthService);
   private router = inject(Router);
+  private fb = inject(FormBuilder);
   
   reportes: Reporte[] = [];
   loading = true;
   error: string | null = null;
   currentUser = this.authService.getCurrentUser();
+  showEditForm = false;
+  saving = false;
+  editForm: FormGroup;
+
+  constructor() {
+    this.editForm = this.fb.group({
+      nombre: ['', [Validators.required, Validators.minLength(2)]],
+      apellidos: ['', [Validators.required, Validators.minLength(2)]],
+      email: ['', [Validators.required, Validators.email]],
+      telefono: ['', [Validators.pattern(/^[0-9]{10}$/)]],
+      direccion: ['']
+    });
+  }
 
   ngOnInit() {
     this.cargarMisReportes();
     this.escucharCambiosEnTiempoReal();
+    this.initializeForm();
   }
 
   ngOnDestroy() {
@@ -161,5 +177,43 @@ export class MisReportesComponent implements OnInit, OnDestroy {
           console.error('Error en escucha tiempo real:', error);
         }
       });
+  }
+
+  private initializeForm() {
+    if (this.currentUser) {
+      this.editForm.patchValue({
+        nombre: this.currentUser.nombre,
+        apellidos: this.currentUser.apellidos,
+        email: this.currentUser.email,
+        telefono: (this.currentUser as any).telefono || '',
+        direccion: (this.currentUser as any).direccion || ''
+      });
+    }
+  }
+
+  toggleEditProfile() {
+    this.showEditForm = !this.showEditForm;
+    if (this.showEditForm) {
+      this.initializeForm();
+    }
+  }
+
+  cancelEdit() {
+    this.showEditForm = false;
+    this.initializeForm();
+  }
+
+  saveProfile() {
+    if (this.editForm.valid && !this.saving) {
+      this.saving = true;
+      
+      // Simular guardado (aquí iría la lógica real de actualización)
+      setTimeout(() => {
+        console.log('Perfil actualizado:', this.editForm.value);
+        this.saving = false;
+        this.showEditForm = false;
+        // Aquí actualizarías el usuario en el servicio
+      }, 1000);
+    }
   }
 }

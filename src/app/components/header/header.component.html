@@ -8,21 +8,22 @@
   <div class="flex flex-1 justify-end gap-6">
     <nav class="flex items-center gap-8">
       <a routerLink="/inicio" routerLinkActive="text-blue-600" class="text-slate-600 text-base font-medium leading-normal hover:text-blue-600 transition-colors">Inicio</a>
-      <a *ngIf="authService.isAuthenticated()" routerLink="/servicios" routerLinkActive="text-blue-600" class="text-slate-600 text-base font-medium leading-normal hover:text-blue-600 transition-colors">Servicios</a>
-      <!-- <a *ngIf="authService.isAuthenticated()" routerLink="/admin-panel" routerLinkActive="text-blue-600" class="text-slate-600 text-base font-medium leading-normal hover:text-blue-600 transition-colors">Reportes</a> -->
+      <a  routerLink="/servicios" routerLinkActive="text-blue-600" class="text-slate-600 text-base font-medium leading-normal hover:text-blue-600 transition-colors">Servicios</a>
+      <a href="#" class="text-slate-600 text-base font-medium leading-normal hover:text-blue-600 transition-colors">Nosotros</a>
       <a href="#" class="text-slate-600 text-base font-medium leading-normal hover:text-blue-600 transition-colors">Contacto</a>
     </nav>
     <div class="flex items-center gap-4">
       <a *ngIf="!authService.isAuthenticated()" routerLink="/login" class="inline-flex h-10 items-center justify-center rounded-md bg-blue-600 px-6 text-sm font-medium text-white shadow transition-colors hover:bg-blue-700">
         Iniciar Sesión
       </a>
-      <div *ngIf="authService.isAuthenticated()" class="flex items-center gap-3">
-        <button  class="flex items-center justify-center rounded-full size-10 text-slate-500 hover:bg-slate-100 hover:text-slate-700 transition-colors">
-          <svg fill="currentColor" height="24px" viewBox="0 0 256 256" width="24px" xmlns="http://www.w3.org/2000/svg">
+      <div *ngIf="authService.isAuthenticated()" class="flex items-center gap-4">
+        <button class="p-2 rounded-full hover:bg-slate-200 transition-colors">
+          <svg fill="currentColor" height="24" viewBox="0 0 256 256" width="24" xmlns="http://www.w3.org/2000/svg">
             <path d="M221.8,175.94C216.25,166.38,208,139.33,208,104a80,80,0,1,0-160,0c0,35.34-8.26,62.38-13.81,71.94A16,16,0,0,0,48,200H88.81a40,40,0,0,0,78.38,0H208a16,16,0,0,0,13.8-24.06ZM128,216a24,24,0,0,1-22.62-16h45.24A24,24,0,0,1,128,216ZM48,184c7.7-13.24,16-43.92,16-80a64,64,0,1,1,128,0c0,36.05,8.28,66.73,16,80Z"></path>
           </svg>
         </button>
-        <!-- <button  (click)="goToReports()" class="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-10 hover:ring-2 hover:ring-blue-500 hover:ring-offset-2 transition-all" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuBI_LfxDCc3NTl3qPZPgam1o0L0oxOBmirdAc8RH96HgCpMi2JzlDhIRrDb8RNCWAVutPmQXaJbs-RiPqZFowNc4nuwB_10p9_BPwE-6JIj03tr6c0XnireCQatBR_POUwLmp4BjuD79VpOaJMHnn99kIOXBJRs4lYC_FTOVeYa8xAzPqJX1jx9kLhubRrWz1iXDqtHjbTYnMBXlQT14QOvhFgH-B9KKD_Nq4cVIlxLVVQuWc2BcEg5XMAaaTQFO-07zoSeJ5JENTWz");'></button> -->
+        <div (click)="goToReports()" class="bg-center bg-no-repeat aspect-square bg-cover rounded-full h-10 w-10 cursor-pointer hover:ring-2 hover:ring-blue-500 hover:ring-offset-2 transition-all" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuCeq-RbE1qUjmkCvgiKB4yVIrcZFkkxEXQD4LmFSBnfh--avBhXcfkv38GLpSZSrc0ruqjEB_hxXt4wrgpXzoe-TWEawEWSHiL9V7sw3_WQcEWuIpvIdhgSN2-DUQiyFE0WhfUCDsDPe7ylVTH0Z1HwsRy32kJRilTiuO2BHVd8UpmmdTBOFfEFBRxXyv4iVE4pBJwytX9tK8_i3cjSXVCeMmAjEp3Ilimj-Yy6DgvcrJXXIsLKs222Bm_ydaqwrbGFzlv3NkqHOjjo");'>
+        </div>
         <button (click)="logout()" class="flex items-center gap-2 px-3 py-2 text-slate-600 hover:bg-red-50 hover:text-red-700 rounded-lg transition-colors">
           <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>

@@ -8,11 +8,12 @@ import { AuthService } from '../../services/auth.service';
 import { LoggerService } from '../../services/logger.service';
 import { ReporteValidators } from '../../validators/reporte.validators';
 import { TipoServicio, PrioridadReporte, EstadoReporte, ReporteCreate } from '../../models/reporte.model';
+import { HeaderComponent } from "src/app/components/header/header.component";
 
 @Component({
   selector: 'app-nuevo-reporte',
   standalone: true,
-  imports: [RouterLink, ReactiveFormsModule, CommonModule],
+  imports: [RouterLink, ReactiveFormsModule, CommonModule, HeaderComponent],
   templateUrl: './nuevo-reporte.component.html',
   styles: []
 })

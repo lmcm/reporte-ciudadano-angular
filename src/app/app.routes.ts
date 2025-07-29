@@ -38,7 +38,7 @@ export const routes: Routes = [
   { 
     path: 'servicios', 
     loadComponent: () => import('./pages/servicios/servicios.component').then(m => m.ServiciosComponent),
-    canActivate: [authGuard]
+    //canActivate: [authGuard]
   },
   { path: '**', redirectTo: '/inicio' }
 ];
