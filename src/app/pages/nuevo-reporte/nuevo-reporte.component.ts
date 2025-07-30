@@ -113,7 +113,7 @@ export class NuevoReporteComponent implements OnInit, OnDestroy {
       ciudadanoApellidos: formData.ciudadanoApellidos.trim(),
       ciudadanoEmail: formData.ciudadanoEmail.trim().toLowerCase(),
       ciudadanoTelefono: formData.ciudadanoTelefono.trim(),
-      estado: EstadoReporte.PENDIENTE,
+      estado: EstadoReporte.PENDIENTE, // Estado inicial para historial
       prioridad: this.calculatePriority(formData.tipoServicio),
       evidenciasFotograficas: this.selectedFile ? [] : undefined
     };

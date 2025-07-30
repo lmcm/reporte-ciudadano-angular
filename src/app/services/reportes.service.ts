@@ -90,15 +90,15 @@ export class ReportesService {
       switchMap(folio => {
         const historialInicial: HistorialEstado = {
           estado: reporte.estado,
-          fecha: serverTimestamp()
+          fecha: Timestamp.now()
         };
         
         const reporteData = {
           ...reporte,
           folio,
           historialEstados: [historialInicial],
-          fechaCreacion: serverTimestamp(),
-          fechaActualizacion: serverTimestamp(),
+          fechaCreacion: Timestamp.now(),
+          fechaActualizacion: Timestamp.now(),
           activo: true
         };
 
@@ -151,7 +151,7 @@ export class ReportesService {
     const docRef = doc(this.db, this.COLLECTION_NAME, id);
     const updateData = {
       ...updates,
-      fechaActualizacion: serverTimestamp()
+      fechaActualizacion: Timestamp.now()
     };
 
     return from(updateDoc(docRef, updateData))
@@ -221,7 +221,7 @@ export class ReportesService {
     
     return from(updateDoc(docRef, { 
       activo: false, 
-      fechaActualizacion: serverTimestamp() 
+      fechaActualizacion: Timestamp.now() 
     }))
       .pipe(
         tap(() => this.logger.info('Reporte eliminado exitosamente', { reporteId: id })),
@@ -288,12 +288,12 @@ export class ReportesService {
             lastDoc = doc;
           });
 
-          // Si hay ciudadanoId o ciudadanoEmail, ordenar manualmente por fecha (menos reciente a más reciente)
+          // Si hay ciudadanoId o ciudadanoEmail, ordenar manualmente por folio descendente
           if (filtros?.ciudadanoId || filtros?.ciudadanoEmail) {
             reportes = reportes.sort((a, b) => {
-              const fechaA = a.fechaCreacion instanceof Timestamp ? a.fechaCreacion.toDate() : new Date(a.fechaCreacion);
-              const fechaB = b.fechaCreacion instanceof Timestamp ? b.fechaCreacion.toDate() : new Date(b.fechaCreacion);
-              return fechaA.getTime() - fechaB.getTime();
+              const folioA = parseInt((a.folio || '0').replace(/\D/g, ''));
+              const folioB = parseInt((b.folio || '0').replace(/\D/g, ''));
+              return folioB - folioA; // Mayor folio primero
             });
           }
 
@@ -342,12 +342,12 @@ export class ReportesService {
             reportes.push({ id: doc.id, ...doc.data() } as Reporte);
           });
           
-          // Si hay ciudadanoId o ciudadanoEmail, ordenar manualmente por fecha (menos reciente a más reciente)
+          // Si hay ciudadanoId o ciudadanoEmail, ordenar manualmente por folio descendente
           if (filtros?.ciudadanoId || filtros?.ciudadanoEmail) {
             reportes = reportes.sort((a, b) => {
-              const fechaA = a.fechaCreacion instanceof Timestamp ? a.fechaCreacion.toDate() : new Date(a.fechaCreacion);
-              const fechaB = b.fechaCreacion instanceof Timestamp ? b.fechaCreacion.toDate() : new Date(b.fechaCreacion);
-              return fechaA.getTime() - fechaB.getTime();
+              const folioA = parseInt((a.folio || '0').replace(/\D/g, ''));
+              const folioB = parseInt((b.folio || '0').replace(/\D/g, ''));
+              return folioB - folioA; // Mayor folio primero
             });
           }
           

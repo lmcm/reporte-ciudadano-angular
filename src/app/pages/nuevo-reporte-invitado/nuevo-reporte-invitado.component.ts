@@ -104,7 +104,7 @@ export class NuevoReporteInvitadoComponent implements OnInit {
         tipoServicio: formData.tipoServicio,
         direccion: formData.direccion,
         comentarios: formData.comentarios,
-        estado: EstadoReporte.PENDIENTE,
+        estado: EstadoReporte.PENDIENTE, // Estado inicial para historial
         prioridad: PrioridadReporte.MEDIA,
         ciudadanoId: 'invitado_' + Date.now(),
         ciudadanoNombre: 'Usuario',
