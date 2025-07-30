@@ -43,6 +43,16 @@ export class MisReportesComponent implements OnInit, OnDestroy {
     this.cargarMisReportes();
     this.escucharCambiosEnTiempoReal();
     this.initializeForm();
+    
+    // Suscribirse a cambios del usuario actual
+    this.authService.currentUser$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(user => {
+        this.currentUser = user;
+        if (this.showEditForm) {
+          this.initializeForm();
+        }
+      });
   }
 
   ngOnDestroy() {
@@ -182,12 +192,14 @@ export class MisReportesComponent implements OnInit, OnDestroy {
   private initializeForm() {
     if (this.currentUser) {
       this.editForm.patchValue({
-        nombre: this.currentUser.nombre,
-        apellidos: this.currentUser.apellidos,
-        email: this.currentUser.email,
+        nombre: this.currentUser.nombre || '',
+        apellidos: this.currentUser.apellidos || '',
+        email: this.currentUser.email || '',
         telefono: (this.currentUser as any).telefono || '',
         direccion: (this.currentUser as any).direccion || ''
       });
+      // Marcar el formulario como pristine después de inicializar
+      this.editForm.markAsPristine();
     }
   }
 
@@ -207,13 +219,51 @@ export class MisReportesComponent implements OnInit, OnDestroy {
     if (this.editForm.valid && !this.saving) {
       this.saving = true;
       
-      // Simular guardado (aquí iría la lógica real de actualización)
-      setTimeout(() => {
-        console.log('Perfil actualizado:', this.editForm.value);
-        this.saving = false;
-        this.showEditForm = false;
-        // Aquí actualizarías el usuario en el servicio
-      }, 1000);
+      const formData = this.editForm.value;
+      
+      // Actualizar el usuario actual con los nuevos datos
+      this.authService.updateUserProfile(formData)
+        .pipe(takeUntil(this.destroy$))
+        .subscribe({
+          next: (updatedUser) => {
+            this.currentUser = updatedUser;
+            this.saving = false;
+            this.showEditForm = false;
+            console.log('Perfil actualizado exitosamente');
+          },
+          error: (error) => {
+            console.error('Error al actualizar perfil:', error);
+            this.saving = false;
+          }
+        });
     }
+  }
+
+  isFormValid(): boolean {
+    return this.editForm.valid && this.editForm.dirty;
+  }
+
+  getFieldError(fieldName: string): string | null {
+    const field = this.editForm.get(fieldName);
+    if (field && field.invalid && (field.dirty || field.touched)) {
+      if (field.errors?.['required']) {
+        return 'Este campo es requerido';
+      }
+      if (field.errors?.['email']) {
+        return 'Ingresa un email válido';
+      }
+      if (field.errors?.['minlength']) {
+        return `Mínimo ${field.errors['minlength'].requiredLength} caracteres`;
+      }
+      if (field.errors?.['pattern']) {
+        return 'Formato inválido';
+      }
+    }
+    return null;
+  }
+
+  hasFieldError(fieldName: string): boolean {
+    const field = this.editForm.get(fieldName);
+    return !!(field && field.invalid && (field.dirty || field.touched));
   }
 }

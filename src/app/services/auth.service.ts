@@ -7,6 +7,8 @@ export interface Usuario {
   nombre: string;
   apellidos: string;
   email: string;
+  telefono?: string;
+  direccion?: string;
   fechaRegistro: Date;
 }
 
@@ -98,6 +100,33 @@ export class AuthService {
   logout(): void {
     this.setCurrentUser(null);
     localStorage.removeItem('activeUser');
+  }
+
+  updateUserProfile(profileData: Partial<Usuario>): Observable<Usuario> {
+    const currentUser = this.getCurrentUser();
+    if (!currentUser) {
+      return throwError(() => new Error('Usuario no autenticado'));
+    }
+
+    // Actualizar el usuario en el array de usuarios
+    const userIndex = this.users.findIndex(u => u.id === currentUser.id);
+    if (userIndex === -1) {
+      return throwError(() => new Error('Usuario no encontrado'));
+    }
+
+    const updatedUser: Usuario = {
+      ...currentUser,
+      ...profileData,
+      id: currentUser.id, // Mantener el ID original
+      fechaRegistro: currentUser.fechaRegistro // Mantener la fecha de registro original
+    };
+
+    this.users[userIndex] = updatedUser;
+    this.saveUsersToStorage();
+    this.setCurrentUser(updatedUser);
+    this.saveActiveSession(updatedUser);
+
+    return of(updatedUser).pipe(delay(500));
   }
 
   private generateId(): string {

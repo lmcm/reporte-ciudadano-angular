@@ -215,12 +215,12 @@ export class ReportesService {
             lastDoc = doc;
           });
 
-          // Si hay ciudadanoId o ciudadanoEmail, ordenar manualmente por fecha
+          // Si hay ciudadanoId o ciudadanoEmail, ordenar manualmente por fecha (menos reciente a más reciente)
           if (filtros?.ciudadanoId || filtros?.ciudadanoEmail) {
             reportes = reportes.sort((a, b) => {
               const fechaA = a.fechaCreacion instanceof Timestamp ? a.fechaCreacion.toDate() : new Date(a.fechaCreacion);
               const fechaB = b.fechaCreacion instanceof Timestamp ? b.fechaCreacion.toDate() : new Date(b.fechaCreacion);
-              return fechaB.getTime() - fechaA.getTime();
+              return fechaA.getTime() - fechaB.getTime();
             });
           }
 
@@ -269,12 +269,12 @@ export class ReportesService {
             reportes.push({ id: doc.id, ...doc.data() } as Reporte);
           });
           
-          // Si hay ciudadanoId o ciudadanoEmail, ordenar manualmente por fecha
+          // Si hay ciudadanoId o ciudadanoEmail, ordenar manualmente por fecha (menos reciente a más reciente)
           if (filtros?.ciudadanoId || filtros?.ciudadanoEmail) {
             reportes = reportes.sort((a, b) => {
               const fechaA = a.fechaCreacion instanceof Timestamp ? a.fechaCreacion.toDate() : new Date(a.fechaCreacion);
               const fechaB = b.fechaCreacion instanceof Timestamp ? b.fechaCreacion.toDate() : new Date(b.fechaCreacion);
-              return fechaB.getTime() - fechaA.getTime();
+              return fechaA.getTime() - fechaB.getTime();
             });
           }
           
