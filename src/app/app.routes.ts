@@ -28,7 +28,7 @@ export const routes: Routes = [
   { 
     path: 'admin-panel', 
     loadComponent: () => import('./pages/admin-panel/admin-panel.component').then(m => m.AdminPanelComponent),
-   // canActivate: [authGuard]
+    //canActivate: [authGuard]
   },
   { 
     path: 'reporte-detalle/:id', 
@@ -39,6 +39,10 @@ export const routes: Routes = [
     path: 'servicios', 
     loadComponent: () => import('./pages/servicios/servicios.component').then(m => m.ServiciosComponent),
     //canActivate: [authGuard]
+  },
+  { 
+    path: 'nuevo-reporte-invitado', 
+    loadComponent: () => import('./pages/nuevo-reporte-invitado/nuevo-reporte-invitado.component').then(m => m.NuevoReporteInvitadoComponent)
   },
   { path: '**', redirectTo: '/inicio' }
 ];

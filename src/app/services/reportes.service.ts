@@ -18,11 +18,13 @@ import {
   DocumentSnapshot,
   QueryConstraint,
   onSnapshot,
-  serverTimestamp
+  serverTimestamp,
+  runTransaction,
+  setDoc
 } from 'firebase/firestore';
 import { FirebaseService } from './firebase.service';
 import { LoggerService } from './logger.service';
-import { Reporte, ReporteCreate, ReporteUpdate, EstadoReporte, PrioridadReporte, TipoServicio } from '../models/reporte.model';
+import { Reporte, ReporteCreate, ReporteUpdate, EstadoReporte, PrioridadReporte, TipoServicio, HistorialEstado } from '../models/reporte.model';
 
 export interface ReporteFilter {
   estado?: EstadoReporte;
@@ -54,17 +56,27 @@ export class ReportesService {
     this.logger.info('ReportesService inicializado');
   }
 
-  // Generar folio consecutivo
+  // Generar folio consecutivo usando transacciones
   private async generarFolio(): Promise<string> {
     const year = new Date().getFullYear();
-    const q = query(
-      collection(this.db, this.COLLECTION_NAME),
-      where('activo', '==', true)
-    );
+    const counterDocRef = doc(this.db, 'counters', 'reportes');
     
-    const querySnapshot = await getDocs(q);
-    const count = querySnapshot.size + 1;
-    return `#${year}${count.toString().padStart(4, '0')}`;
+    return await runTransaction(this.db, async (transaction) => {
+      const counterDoc = await transaction.get(counterDocRef);
+      
+      let nextNumber = 1;
+      if (counterDoc.exists()) {
+        const data = counterDoc.data();
+        nextNumber = (data[year] || 0) + 1;
+      }
+      
+      // Actualizar el contador
+      transaction.set(counterDocRef, {
+        [year]: nextNumber
+      }, { merge: true });
+      
+      return `${year}${nextNumber.toString().padStart(4, '0')}`;
+    });
   }
 
   // Crear nuevo reporte
@@ -76,9 +88,15 @@ export class ReportesService {
     
     return from(this.generarFolio()).pipe(
       switchMap(folio => {
+        const historialInicial: HistorialEstado = {
+          estado: reporte.estado,
+          fecha: serverTimestamp()
+        };
+        
         const reporteData = {
           ...reporte,
           folio,
+          historialEstados: [historialInicial],
           fechaCreacion: serverTimestamp(),
           fechaActualizacion: serverTimestamp(),
           activo: true
@@ -88,7 +106,7 @@ export class ReportesService {
           .pipe(
             map(docRef => {
               this.logger.info('Reporte creado exitosamente', { reporteId: docRef.id, folio });
-              return docRef.id;
+              return folio;
             })
           );
       }),
@@ -125,6 +143,11 @@ export class ReportesService {
   // Actualizar reporte
   actualizarReporte(id: string, updates: ReporteUpdate): Observable<void> {
     this.logger.info('Actualizando reporte', { reporteId: id, updates });
+    
+    if (updates.estado) {
+      return this.actualizarConHistorial(id, updates);
+    }
+    
     const docRef = doc(this.db, this.COLLECTION_NAME, id);
     const updateData = {
       ...updates,
@@ -139,6 +162,56 @@ export class ReportesService {
           return throwError(() => this.firebaseService.handleFirebaseError(error));
         })
       );
+  }
+
+  // Actualizar reporte manteniendo historial de estados
+  private actualizarConHistorial(id: string, updates: ReporteUpdate): Observable<void> {
+    const docRef = doc(this.db, this.COLLECTION_NAME, id);
+    
+    return from(runTransaction(this.db, async (transaction) => {
+      const reporteDoc = await transaction.get(docRef);
+      
+      if (!reporteDoc.exists()) {
+        throw new Error('Reporte no encontrado');
+      }
+      
+      const reporteData = reporteDoc.data() as Reporte;
+      const historialActual = reporteData.historialEstados || [];
+      
+      this.logger.info('Estado actual vs nuevo', { 
+        estadoActual: reporteData.estado, 
+        nuevoEstado: updates.estado 
+      });
+      
+      // Solo agregar al historial si el estado cambió
+      if (updates.estado && updates.estado !== reporteData.estado) {
+        const nuevoHistorial: HistorialEstado = {
+          estado: updates.estado,
+          fecha: Timestamp.now()
+        };
+        
+        historialActual.push(nuevoHistorial);
+        this.logger.info('Agregando nuevo estado al historial', { nuevoHistorial });
+      } else {
+        this.logger.info('Estado no cambió, no se agrega al historial');
+      }
+      
+      const updateData = {
+        ...updates,
+        historialEstados: historialActual,
+        fechaActualizacion: Timestamp.now()
+      };
+      
+      this.logger.info('Datos a actualizar', { updateData });
+      transaction.update(docRef, updateData);
+    }))
+    .pipe(
+      tap(() => this.logger.info('Reporte actualizado con historial', { reporteId: id })),
+      catchError(error => {
+        this.logger.error('Error al actualizar reporte con historial', { error, reporteId: id });
+        return throwError(() => this.firebaseService.handleFirebaseError(error));
+      })
+    );
   }
 
   // Eliminar reporte (soft delete)
@@ -327,11 +400,11 @@ export class ReportesService {
             reportes.push({ id: doc.id, ...doc.data() } as Reporte);
           });
           
-          // Ordenar manualmente por fecha de creación (más reciente primero)
+          // Ordenar por número de folio descendente
           reportes.sort((a, b) => {
-            const dateA = a.fechaCreacion instanceof Date ? a.fechaCreacion : new Date(a.fechaCreacion as any);
-            const dateB = b.fechaCreacion instanceof Date ? b.fechaCreacion : new Date(b.fechaCreacion as any);
-            return dateB.getTime() - dateA.getTime();
+            const folioA = parseInt((a.folio || '0').replace(/\D/g, ''));
+            const folioB = parseInt((b.folio || '0').replace(/\D/g, ''));
+            return folioB - folioA;
           });
           
           this.logger.debug('Todos los reportes obtenidos', { count: reportes.length });

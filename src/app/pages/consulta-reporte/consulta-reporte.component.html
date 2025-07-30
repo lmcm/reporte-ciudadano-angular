@@ -45,36 +45,46 @@
         </div>
         <button 
           (click)="buscarReporte()"
-          class="w-full sm:w-auto flex items-center justify-center gap-2 px-6 py-3 bg-blue-600 text-white font-semibold rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-600 transition-colors duration-200 shadow-sm whitespace-nowrap">
-          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          [disabled]="loading"
+          class="w-full sm:w-auto flex items-center justify-center gap-2 px-6 py-3 bg-blue-600 text-white font-semibold rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-600 transition-colors duration-200 shadow-sm whitespace-nowrap disabled:opacity-50">
+          <svg *ngIf="!loading" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
             <path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
           </svg>
-          <span>Buscar</span>
+          <div *ngIf="loading" class="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
+          <span>{{ loading ? 'Buscando...' : 'Buscar' }}</span>
         </button>
       </div>
       
-      <div *ngIf="reporteEncontrado" class="border-t border-slate-200 pt-8">
+      <div *ngIf="reporteEncontrado && reporte" class="border-t border-slate-200 pt-8">
         <h3 class="text-2xl font-bold text-slate-900 mb-6">Detalles del Reporte</h3>
         <div class="space-y-6">
+          <div class="flex flex-col sm:flex-row">
+            <p class="w-full sm:w-1/3 text-gray-500 font-medium">Folio</p>
+            <p class="w-full sm:w-2/3 text-gray-700 font-semibold">{{ reporte.folio }}</p>
+          </div>
           <div class="flex flex-col sm:flex-row">
             <p class="w-full sm:w-1/3 text-gray-500 font-medium">Estado</p>
             <div class="w-full sm:w-2/3 flex items-center gap-2">
               <span class="px-3 py-1 text-sm font-semibold text-yellow-800 bg-yellow-100 rounded-full">
-                {{ reporte.estado }}
+                {{ getStatusText(reporte.estado) }}
               </span>
             </div>
           </div>
           <div class="flex flex-col sm:flex-row">
             <p class="w-full sm:w-1/3 text-gray-500 font-medium">Fecha de Reporte</p>
-            <p class="w-full sm:w-2/3 text-gray-700">{{ reporte.fecha }}</p>
+            <p class="w-full sm:w-2/3 text-gray-700">{{ formatearFecha(reporte.fechaCreacion) }}</p>
           </div>
           <div class="flex flex-col sm:flex-row">
             <p class="w-full sm:w-1/3 text-gray-500 font-medium">Tipo de Servicio</p>
-            <p class="w-full sm:w-2/3 text-gray-700">{{ reporte.tipo }}</p>
+            <p class="w-full sm:w-2/3 text-gray-700">{{ getTipoServicioText(reporte.tipoServicio) }}</p>
           </div>
           <div class="flex flex-col sm:flex-row">
             <p class="w-full sm:w-1/3 text-gray-500 font-medium">Comentarios</p>
             <p class="w-full sm:w-2/3 text-gray-700 leading-relaxed">{{ reporte.comentarios }}</p>
+          </div>
+          <div *ngIf="reporte.direccion" class="flex flex-col sm:flex-row">
+            <p class="w-full sm:w-1/3 text-gray-500 font-medium">Dirección</p>
+            <p class="w-full sm:w-2/3 text-gray-700">{{ reporte.direccion }}</p>
           </div>
         </div>
       </div>

@@ -38,11 +38,7 @@ export class AdminPanelComponent implements OnInit, OnDestroy {
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (reportes) => {
-          this.reportes = reportes.sort((a, b) => {
-            const dateA = a.fechaCreacion instanceof Date ? a.fechaCreacion : new Date(a.fechaCreacion as any);
-            const dateB = b.fechaCreacion instanceof Date ? b.fechaCreacion : new Date(b.fechaCreacion as any);
-            return dateB.getTime() - dateA.getTime(); // Más reciente primero
-          });
+          this.reportes = reportes;
           this.loading = false;
         },
         error: (error) => {

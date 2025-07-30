@@ -1,5 +1,11 @@
 import { Timestamp, FieldValue } from 'firebase/firestore';
 
+export interface HistorialEstado {
+  estado: EstadoReporte;
+  fecha: Timestamp | Date | FieldValue;
+  usuario?: string;
+}
+
 export interface Reporte {
   id?: string;
   folio?: string;
@@ -8,6 +14,7 @@ export interface Reporte {
   coordenadas?: Coordenadas;
   comentarios: string;
   estado: EstadoReporte;
+  historialEstados?: HistorialEstado[];
   fechaCreacion: Timestamp | Date;
   fechaActualizacion: Timestamp | Date;
   ciudadanoId: string;
@@ -38,6 +45,7 @@ export interface ReporteUpdate {
   coordenadas?: Coordenadas;
   comentarios?: string;
   estado?: EstadoReporte;
+  historialEstados?: HistorialEstado[];
   fechaActualizacion?: Timestamp | Date | FieldValue;
   ciudadanoNombre?: string;
   ciudadanoApellidos?: string;

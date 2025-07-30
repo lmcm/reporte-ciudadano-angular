@@ -181,18 +181,27 @@
       <!-- Historial de Actualizaciones -->
       <div *ngIf="reporte && !loading && !error" class="bg-white rounded-lg shadow-md p-6 md:p-8 mt-8">
         <h3 class="text-xl font-bold tracking-tight mb-4">Historial de Actualizaciones</h3>
-        <div class="border-l-2 border-gray-200 ml-2">
-          <div class="relative pl-8 pb-8">
-            <div class="absolute left-[-9px] top-[5px] h-4 w-4 rounded-full bg-green-500"></div>
-            <p class="font-semibold text-gray-800">{{ getStatusText(reporte.estado) }}</p>
-            <p class="text-sm text-gray-500">{{ formatearFecha(reporte.fechaActualizacion || reporte.fechaCreacion) }}</p>
-          </div>
-          <div class="relative pl-8 pb-8">
-            <div class="absolute left-[-9px] top-[5px] h-4 w-4 rounded-full bg-blue-500"></div>
-            <p class="font-semibold text-gray-800">Reporte Creado</p>
-            <p class="text-sm text-gray-500">{{ formatearFecha(reporte.fechaCreacion) }}</p>
+        <div *ngIf="getHistorialOrdenado().length > 0; else sinHistorial" class="border-l-2 border-gray-200 ml-2">
+          <div *ngFor="let historial of getHistorialOrdenado(); let i = index" class="relative pl-8 pb-8">
+            <div class="absolute left-[-9px] top-[5px] h-4 w-4 rounded-full"
+                 [ngClass]="{
+                   'bg-green-500': historial.estado === 'completado',
+                   'bg-blue-500': historial.estado === 'en_progreso',
+                   'bg-yellow-500': historial.estado === 'pendiente',
+                   'bg-red-500': historial.estado === 'cancelado'
+                 }"></div>
+            <p class="font-semibold text-gray-800">{{ getStatusText(historial.estado) }}</p>
+            <p class="text-sm text-gray-500">{{ formatearFechaHora(historial.fecha) }}</p>
+            <span *ngIf="i === 0" class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800 mt-1">
+              Estado Actual
+            </span>
           </div>
         </div>
+        <ng-template #sinHistorial>
+          <div class="text-center py-8 text-slate-500">
+            <p>No hay historial de estados disponible.</p>
+          </div>
+        </ng-template>
       </div>
       
       <!-- Comentarios -->

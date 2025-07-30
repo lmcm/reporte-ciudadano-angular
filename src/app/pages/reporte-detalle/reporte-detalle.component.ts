@@ -6,7 +6,7 @@ import { Subject, takeUntil } from 'rxjs';
 import { ReportesService } from '../../services/reportes.service';
 import { ComentariosService } from '../../services/comentarios.service';
 import { AuthService } from '../../services/auth.service';
-import { Reporte, EstadoReporte, TipoServicio } from '../../models/reporte.model';
+import { Reporte, EstadoReporte, TipoServicio, HistorialEstado } from '../../models/reporte.model';
 import { Comentario, ComentarioCreate, TipoAutor } from '../../models/comentario.model';
 
 @Component({
@@ -202,6 +202,36 @@ export class ReporteDetalleComponent implements OnInit, OnDestroy {
     return palabras[0].charAt(0).toUpperCase() + palabras[0].slice(1).toLowerCase();
   }
 
+  getHistorialOrdenado(): HistorialEstado[] {
+    if (!this.reporte?.historialEstados) return [];
+    return [...this.reporte.historialEstados].sort((a, b) => {
+      const fechaA = a.fecha instanceof Date ? a.fecha : (a.fecha as any).toDate();
+      const fechaB = b.fecha instanceof Date ? b.fecha : (b.fecha as any).toDate();
+      return fechaB.getTime() - fechaA.getTime(); // Más reciente primero
+    });
+  }
+
+  formatearFechaHora(fecha: any): string {
+    if (!fecha) return 'Sin fecha';
+    
+    let date: Date;
+    if (fecha.toDate) {
+      date = fecha.toDate();
+    } else if (fecha instanceof Date) {
+      date = fecha;
+    } else {
+      date = new Date(fecha);
+    }
+    
+    return date.toLocaleDateString('es-MX', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    });
+  }
+
   guardarCambios() {
     if (!this.reporte || this.actualizandoEstado || this.actualizandoArea) return;
     
@@ -220,6 +250,8 @@ export class ReporteDetalleComponent implements OnInit, OnDestroy {
           console.log('Cambios guardados correctamente');
           this.actualizandoEstado = false;
           this.actualizandoArea = false;
+          // Recargar el reporte para mostrar el historial actualizado
+          this.cargarReporte();
         },
         error: (error) => {
           console.error('Error al guardar cambios:', error);
