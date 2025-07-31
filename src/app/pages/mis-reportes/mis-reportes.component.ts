@@ -28,6 +28,7 @@ export class MisReportesComponent implements OnInit, OnDestroy {
   showEditForm = false;
   saving = false;
   editForm: FormGroup;
+  showMobileMenu = false;
 
   constructor() {
     this.editForm = this.fb.group({
@@ -265,5 +266,13 @@ export class MisReportesComponent implements OnInit, OnDestroy {
   hasFieldError(fieldName: string): boolean {
     const field = this.editForm.get(fieldName);
     return !!(field && field.invalid && (field.dirty || field.touched));
+  }
+
+  toggleMobileMenu() {
+    this.showMobileMenu = !this.showMobileMenu;
+  }
+
+  closeMobileMenu() {
+    this.showMobileMenu = false;
   }
 }

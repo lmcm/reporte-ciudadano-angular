@@ -13,6 +13,8 @@ import { FooterComponent } from '../../components/footer/footer.component';
   styles: []
 })
 export class ServiciosComponent {
+  showMobileMenu = false;
+  
   servicios = [
     {
       titulo: 'Reparación de Calle',
@@ -36,4 +38,12 @@ export class ServiciosComponent {
       imagenDespues: 'https://lh3.googleusercontent.com/aida-public/AB6AXuAUcyQ0Umneo5a6_FFl7bYxxvjJ99BxkQhs5c6a8m9rFY9W-xNSkueALiihb2AfkCV-CyVieLn_6ILw_eewMioaqGknjXr1b0lJo4TddXq_T5_p25uxv5AXR0Faw47SCSdnkCWR8l6S4jH5sRh2A_1oC7dfXLSPVgz3ovhOHJ5BCnSv665rHeMKMWBYm2_mCfBrI8E1XjuChyNDruvTOpmDmAkj_wFIPT7EcXjvyHDZzK206DMIDV74SO7t1xsEn6kNZUt9PC5xLj-i'
     }
   ];
+
+  toggleMobileMenu() {
+    this.showMobileMenu = !this.showMobileMenu;
+  }
+
+  closeMobileMenu() {
+    this.showMobileMenu = false;
+  }
 }

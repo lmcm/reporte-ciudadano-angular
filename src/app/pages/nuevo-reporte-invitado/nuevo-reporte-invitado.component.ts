@@ -18,6 +18,7 @@ export class NuevoReporteInvitadoComponent implements OnInit {
   private router = inject(Router);
   private reportesService = inject(ReportesService);
 
+  showMobileMenu = false;
   reporteForm!: FormGroup;
   isLoading = false;
   successMessage = '';
@@ -90,6 +91,14 @@ export class NuevoReporteInvitadoComponent implements OnInit {
     }
 
     return 'Campo inválido';
+  }
+
+  toggleMobileMenu() {
+    this.showMobileMenu = !this.showMobileMenu;
+  }
+
+  closeMobileMenu() {
+    this.showMobileMenu = false;
   }
 
   onSubmit() {

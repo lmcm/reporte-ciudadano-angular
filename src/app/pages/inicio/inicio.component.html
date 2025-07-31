@@ -1,20 +1,113 @@
 <div class="relative flex size-full min-h-screen flex-col group/design-root overflow-x-hidden" style='font-family: "Public Sans", "Noto Sans", sans-serif;'>
+  <!-- Header responsivo -->
+  <header class="bg-white shadow-sm">
+    <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex items-center justify-between h-16">
+        <div class="flex items-center gap-3">
+          <svg class="h-8 w-8 text-blue-600" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24">
+            <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+            <circle cx="12" cy="10" r="3"></circle>
+          </svg>
+          <h1 class="text-xl sm:text-2xl font-bold text-slate-900">Boca del Río</h1>
+        </div>
+        
+        <!-- Menú desktop -->
+        <div class="hidden md:flex flex-1 justify-end gap-6">
+          <nav class="flex items-center gap-8">
+            <a routerLink="/inicio" routerLinkActive="text-blue-600" class="text-slate-600 text-base font-medium leading-normal hover:text-blue-600 transition-colors">Inicio</a>
+            <a routerLink="/servicios" routerLinkActive="text-blue-600" class="text-slate-600 text-base font-medium leading-normal hover:text-blue-600 transition-colors">Servicios</a>
+            <a href="#" class="text-slate-600 text-base font-medium leading-normal hover:text-blue-600 transition-colors">Nosotros</a>
+            <a href="#" class="text-slate-600 text-base font-medium leading-normal hover:text-blue-600 transition-colors">Contacto</a>
+          </nav>
+          <div class="flex items-center gap-4">
+            <a routerLink="/login" class="inline-flex h-10 items-center justify-center rounded-md bg-blue-600 px-6 text-sm font-medium text-white shadow transition-colors hover:bg-blue-700">
+              Iniciar Sesión
+            </a>
+          </div>
+        </div>
+        
+        <!-- Botón menú móvil -->
+        <button (click)="toggleMobileMenu()" class="md:hidden p-2 rounded-md hover:bg-slate-100 focus:outline-none focus:ring-2 focus:ring-blue-500">
+          <svg class="h-6 w-6 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+          </svg>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Overlay del menú móvil -->
+  <div *ngIf="showMobileMenu" class="md:hidden fixed inset-0 z-50 bg-black bg-opacity-50" (click)="closeMobileMenu()"></div>
+  
+  <!-- Menú móvil -->
+  <div *ngIf="showMobileMenu" class="md:hidden fixed inset-y-0 left-0 z-50 w-64 bg-white shadow-lg transform transition-transform duration-300 ease-in-out">
+    <div class="flex h-full flex-col p-4">
+      <div class="flex items-center justify-between mb-8">
+        <div class="flex items-center gap-3">
+          <svg class="h-6 w-6 text-blue-600" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24">
+            <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+            <circle cx="12" cy="10" r="3"></circle>
+          </svg>
+          <h1 class="text-lg font-bold text-slate-800">Boca del Río</h1>
+        </div>
+        <button (click)="closeMobileMenu()" class="p-2 rounded-md hover:bg-slate-100 focus:outline-none focus:ring-2 focus:ring-blue-500">
+          <svg class="h-5 w-5 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+          </svg>
+        </button>
+      </div>
+      
+      <nav class="flex flex-col gap-4">
+        <a routerLink="/inicio" (click)="closeMobileMenu()" class="flex items-center gap-3 px-3 py-3 text-slate-700 hover:bg-slate-100 rounded-lg transition-colors">
+          <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path>
+          </svg>
+          <span class="font-medium">Inicio</span>
+        </a>
+        <a routerLink="/servicios" (click)="closeMobileMenu()" class="flex items-center gap-3 px-3 py-3 text-slate-700 hover:bg-slate-100 rounded-lg transition-colors">
+          <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
+          </svg>
+          <span class="font-medium">Servicios</span>
+        </a>
+        <a href="#" (click)="closeMobileMenu()" class="flex items-center gap-3 px-3 py-3 text-slate-700 hover:bg-slate-100 rounded-lg transition-colors">
+          <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
+          </svg>
+          <span class="font-medium">Nosotros</span>
+        </a>
+        <a href="#" (click)="closeMobileMenu()" class="flex items-center gap-3 px-3 py-3 text-slate-700 hover:bg-slate-100 rounded-lg transition-colors">
+          <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
+          </svg>
+          <span class="font-medium">Contacto</span>
+        </a>
+        <div class="border-t border-slate-200 my-4"></div>
+        <a routerLink="/login" (click)="closeMobileMenu()" class="flex items-center justify-center gap-2 px-4 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+          <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
+          </svg>
+          <span class="font-medium">Iniciar Sesión</span>
+        </a>
+      </nav>
+    </div>
+  </div>
+
   <div class="layout-container flex h-full grow flex-col">
-    <app-header></app-header>
     <main class="flex-1">
       <section class="w-full py-20 lg:py-32">
         <div class="container mx-auto px-4 md:px-6">
-          <div class="grid gap-6 lg:grid-cols-2 lg:gap-12">
-            <div class="flex flex-col justify-center space-y-4">
+          <div class="grid gap-6 lg:grid-cols-2 lg:gap-12 items-center">
+            <div class="flex flex-col justify-center space-y-4 text-center lg:text-left">
               <div class="space-y-2">
-                <h1 class="text-4xl font-extrabold tracking-tighter sm:text-5xl md:text-6xl text-slate-900">
+                <h1 class="text-3xl font-extrabold tracking-tighter sm:text-4xl md:text-5xl lg:text-6xl text-slate-900">
                   Conecta con tu Ciudad
                 </h1>
-                <p class="max-w-[600px] text-slate-500 md:text-xl">
+                <p class="max-w-[600px] text-slate-500 text-base sm:text-lg md:text-xl mx-auto lg:mx-0">
                   Reporta problemas, sigue tus solicitudes y mantente informado sobre los servicios municipales en Boca del Río, Veracruz.
                 </p>
               </div>
-              <a routerLink="/login" [queryParams]="{page: 'nuevo-reporte'}" class="inline-flex h-12 items-center justify-center rounded-md bg-blue-600 px-8 text-sm font-bold text-white shadow-lg transition-transform duration-200 ease-in-out hover:scale-105 hover:bg-blue-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 w-fit">
+              <a routerLink="/login" [queryParams]="{page: 'nuevo-reporte'}" class="inline-flex h-12 items-center justify-center rounded-md bg-blue-600 px-6 sm:px-8 text-sm font-bold text-white shadow-lg transition-transform duration-200 ease-in-out hover:scale-105 hover:bg-blue-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 w-fit mx-auto lg:mx-0">
                 Comenzar
               </a>
             </div>
@@ -87,7 +180,7 @@
             <p class="max-w-[600px] text-slate-500 md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed">
               Envía fácilmente un nuevo reporte o consulta el estado de tus solicitudes existentes con solo unos pocos clics.
             </p>
-            <div class="flex flex-col gap-4 sm:flex-row">
+            <div class="flex flex-col gap-4 sm:flex-row sm:justify-center lg:justify-start">
               <a routerLink="/nuevo-reporte-invitado" class="inline-flex h-10 items-center justify-center rounded-md bg-blue-600 px-6 text-sm font-medium text-white shadow transition-colors hover:bg-blue-700 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-blue-500">
                 Reportar un Nuevo Problema
               </a>
@@ -96,9 +189,9 @@
               </a>
             </div>
           </div>
-          <div class="flex gap-4">
-            <img alt="Reportar un Problema" class="mx-auto aspect-[4/5] overflow-hidden rounded-xl object-cover" height="310" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDel3IDAZMt72paETlZHvg2RE7q_kwqiIFjFu4rgmYB6DlSIGLsLTlcUcqniX5diCnmfIBn-t6EamZV8UWCt7-7qv-HnjIjhXD3nNyjYKYxAg-yqZbwO1CzKeg69B6krYAIusK95Rtb3_lanraGePQabkdH-IX05STmIxvGHFQlME7X-uX9F5WUaomIqeptykiMt3DRk7DOhrUtfCj-IstuFQCnGNyt2E4NVtcuOn7xhz45rq6b9C9ZxEs-ZZyNubuCdGIRejKPMzvN" width="275" />
-            <img alt="Seguimiento de Reportes" class="mx-auto aspect-[4/5] overflow-hidden rounded-xl object-cover" height="310" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBVacaKvSIW5Y6xyymGzEbrFQxLu5I7QZESeF9Lg_g5npo-D_4_TExSU936EGFkdc6ukUF511A7SHvh9Y1ZLhZRO5TmgRUplYGslDJmM_1kO_gXA4-lcMY9wj09BFMJPL7qj9rm1_MEZ9AMhPGtrlfS3CPrbxL2YeRMxbey6C9za_9hRoN3wg3JeOwGpbFpyR75Rbzu6uCFtn149HDZzQvMQsBX90johjb6Xd8xJ7Z84e84Su50EKyjdFOIGcIHKOO6VN5TEy12BUiG" width="275" />
+          <div class="flex gap-2 sm:gap-4 justify-center lg:justify-start">
+            <img alt="Reportar un Problema" class="aspect-[4/5] overflow-hidden rounded-xl object-cover w-32 sm:w-40 lg:w-full max-w-[275px]" height="310" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDel3IDAZMt72paETlZHvg2RE7q_kwqiIFjFu4rgmYB6DlSIGLsLTlcUcqniX5diCnmfIBn-t6EamZV8UWCt7-7qv-HnjIjhXD3nNyjYKYxAg-yqZbwO1CzKeg69B6krYAIusK95Rtb3_lanraGePQabkdH-IX05STmIxvGHFQlME7X-uX9F5WUaomIqeptykiMt3DRk7DOhrUtfCj-IstuFQCnGNyt2E4NVtcuOn7xhz45rq6b9C9ZxEs-ZZyNubuCdGIRejKPMzvN" width="275" />
+            <img alt="Seguimiento de Reportes" class="aspect-[4/5] overflow-hidden rounded-xl object-cover w-32 sm:w-40 lg:w-full max-w-[275px]" height="310" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBVacaKvSIW5Y6xyymGzEbrFQxLu5I7QZESeF9Lg_g5npo-D_4_TExSU936EGFkdc6ukUF511A7SHvh9Y1ZLhZRO5TmgRUplYGslDJmM_1kO_gXA4-lcMY9wj09BFMJPL7qj9rm1_MEZ9AMhPGtrlfS3CPrbxL2YeRMxbey6C9za_9hRoN3wg3JeOwGpbFpyR75Rbzu6uCFtn149HDZzQvMQsBX90johjb6Xd8xJ7Z84e84Su50EKyjdFOIGcIHKOO6VN5TEy12BUiG" width="275" />
           </div>
         </div>
       </section>

@@ -30,6 +30,7 @@ export class NuevoReporteComponent implements OnInit, OnDestroy {
   errorMessage = '';
   successMessage = '';
   selectedFile: File | null = null;
+  showMobileMenu = false;
 
   readonly tiposServicio = [
     { value: TipoServicio.LAMPARA, label: 'Lámpara fundida o averiada' },
@@ -197,5 +198,13 @@ export class NuevoReporteComponent implements OnInit, OnDestroy {
   hasError(fieldName: string): boolean {
     const control = this.reporteForm.get(fieldName);
     return !!(control?.errors && control.touched);
+  }
+
+  toggleMobileMenu() {
+    this.showMobileMenu = !this.showMobileMenu;
+  }
+
+  closeMobileMenu() {
+    this.showMobileMenu = false;
   }
 }

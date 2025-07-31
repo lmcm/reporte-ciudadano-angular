@@ -1,96 +1,169 @@
 <div class="flex flex-col min-h-screen bg-slate-50">
   <header class="bg-white shadow-sm">
-    <div class="container mx-auto px-6 py-4 flex justify-between items-center">
+    <div class="container mx-auto px-4 sm:px-6 py-4 flex justify-between items-center">
       <div class="flex items-center gap-3">
-        <svg class="size-8 text-blue-600" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24">
+        <svg class="h-6 w-6 sm:h-8 sm:w-8 text-blue-600" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24">
           <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
           <circle cx="12" cy="10" r="3"></circle>
         </svg>
-        <h1 class="text-2xl font-bold text-slate-900">Boca del Río</h1>
+        <h1 class="text-lg sm:text-2xl font-bold text-slate-900">Boca del Río</h1>
       </div>
+      
+      <!-- Menú desktop -->
       <nav class="hidden md:flex items-center gap-6">
         <a routerLink="/inicio" class="text-slate-600 text-base font-medium leading-normal hover:text-blue-600 transition-colors">Inicio</a>
         <a routerLink="/nuevo-reporte" class="text-slate-600 text-base font-medium leading-normal hover:text-blue-600 transition-colors">Reportar</a>
         <a routerLink="/consulta-reporte" class="text-slate-600 text-base font-medium leading-normal hover:text-blue-600 transition-colors">Consultar</a>
         <a href="#" class="text-slate-600 text-base font-medium leading-normal hover:text-blue-600 transition-colors">Contacto</a>
       </nav>
-      <div class="flex items-center gap-4">
-        <button class="text-gray-500 hover:text-blue-600 focus:outline-none">
-          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+      
+      <div class="flex items-center gap-3 sm:gap-4">
+        <button class="hidden sm:block text-gray-500 hover:text-blue-600 focus:outline-none">
+          <svg class="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
             <path d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
           </svg>
         </button>
-        <img alt="User avatar" class="w-10 h-10 rounded-full" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDxyb2kzv2Cf0uMSxV56Y-s4_qMbdaIhdr6qC9yfAvFjosrkKmaijbHvo-YAQEYMA-EHw-MEAWY-mHMp0fhkjuMjv3P6vaKlta2Xt6TFqf_O4XBqeG2R3JrG5tLqriCGc5ju2rFirPFvd2VrI2hFv0WvtevFkJEyj7qf0UnUgtnDx0I1yqYTfDJS-TjxDkhEtHp6HmTbPP_IcRGlYw3Xug6kemRtCqI0u-sMsyR-jvZmlh7-gcWeWYauvCGRVjHblAEQetlc_9-1CcA" />
+        <img alt="User avatar" class="w-8 h-8 sm:w-10 sm:h-10 rounded-full" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDxyb2kzv2Cf0uMSxV56Y-s4_qMbdaIhdr6qC9yfAvFjosrkKmaijbHvo-YAQEYMA-EHw-MEAWY-mHMp0fhkjuMjv3P6vaKlta2Xt6TFqf_O4XBqeG2R3JrG5tLqriCGc5ju2rFirPFvd2VrI2hFv0WvtevFkJEyj7qf0UnUgtnDx0I1yqYTfDJS-TjxDkhEtHp6HmTbPP_IcRGlYw3Xug6kemRtCqI0u-sMsyR-jvZmlh7-gcWeWYauvCGRVjHblAEQetlc_9-1CcA" />
+        
+        <!-- Botón menú móvil -->
+        <button (click)="toggleMobileMenu()" class="md:hidden p-2 rounded-md hover:bg-slate-100 focus:outline-none focus:ring-2 focus:ring-blue-500">
+          <svg class="h-6 w-6 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+          </svg>
+        </button>
       </div>
     </div>
   </header>
+
+  <!-- Overlay del menú móvil -->
+  <div *ngIf="showMobileMenu" class="md:hidden fixed inset-0 z-50 bg-black bg-opacity-50" (click)="closeMobileMenu()"></div>
   
-  <main class="flex-grow container mx-auto px-6 py-12">
-    <div class="max-w-3xl mx-auto bg-white p-8 rounded-xl shadow-lg">
-      <div class="text-center mb-8">
-        <h2 class="text-4xl font-bold text-slate-900">Consulta tu Reporte</h2>
-        <p class="text-gray-500 mt-2">Ingresa el número de folio para ver el estado y los detalles de tu solicitud.</p>
+  <!-- Menú móvil -->
+  <div *ngIf="showMobileMenu" class="md:hidden fixed inset-y-0 left-0 z-50 w-64 bg-white shadow-lg transform transition-transform duration-300 ease-in-out">
+    <div class="flex h-full flex-col p-4">
+      <div class="flex items-center justify-between mb-8">
+        <div class="flex items-center gap-3">
+          <svg class="h-6 w-6 text-blue-600" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24">
+            <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+            <circle cx="12" cy="10" r="3"></circle>
+          </svg>
+          <h1 class="text-lg font-bold text-slate-800">Boca del Río</h1>
+        </div>
+        <button (click)="closeMobileMenu()" class="p-2 rounded-md hover:bg-slate-100 focus:outline-none focus:ring-2 focus:ring-blue-500">
+          <svg class="h-5 w-5 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+          </svg>
+        </button>
       </div>
       
-      <div class="flex flex-col sm:flex-row items-end gap-4 mb-10">
-        <div class="w-full">
+      <nav class="flex flex-col gap-4">
+        <a routerLink="/inicio" (click)="closeMobileMenu()" class="flex items-center gap-3 px-3 py-3 text-slate-700 hover:bg-slate-100 rounded-lg transition-colors">
+          <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path>
+          </svg>
+          <span class="font-medium">Inicio</span>
+        </a>
+        <a routerLink="/nuevo-reporte" (click)="closeMobileMenu()" class="flex items-center gap-3 px-3 py-3 text-slate-700 hover:bg-slate-100 rounded-lg transition-colors">
+          <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v3m0 0v3m0-3h3m-3 0H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+          </svg>
+          <span class="font-medium">Reportar</span>
+        </a>
+        <a routerLink="/consulta-reporte" (click)="closeMobileMenu()" class="flex items-center gap-3 px-3 py-3 text-slate-900 bg-slate-100 rounded-lg">
+          <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+          </svg>
+          <span class="font-medium">Consultar</span>
+        </a>
+        <a href="#" (click)="closeMobileMenu()" class="flex items-center gap-3 px-3 py-3 text-slate-700 hover:bg-slate-100 rounded-lg transition-colors">
+          <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
+          </svg>
+          <span class="font-medium">Contacto</span>
+        </a>
+      </nav>
+    </div>
+  </div>
+  
+  <main class="flex-grow container mx-auto px-4 sm:px-6 py-6 sm:py-8 lg:py-12">
+    <div class="max-w-3xl mx-auto bg-white p-4 sm:p-6 lg:p-8 rounded-xl shadow-lg">
+      <div class="text-center mb-6 sm:mb-8">
+        <h2 class="text-2xl sm:text-3xl lg:text-4xl font-bold text-slate-900">Consulta tu Reporte</h2>
+        <p class="text-gray-500 mt-2 text-sm sm:text-base">Ingresa el número de folio y tu teléfono para ver el estado y los detalles de tu solicitud.</p>
+      </div>
+      
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
+        <div>
           <label class="block text-sm font-medium text-gray-700 mb-1" for="folio">Número de Folio</label>
           <input 
             [(ngModel)]="folio"
             name="folio"
-            class="w-full px-4 py-3 rounded-md border-slate-300 focus:ring-blue-600 focus:border-blue-600 transition-shadow duration-200 shadow-sm"
+            class="w-full px-3 sm:px-4 py-2.5 sm:py-3 text-sm sm:text-base rounded-md border-slate-300 focus:ring-blue-600 focus:border-blue-600 transition-shadow duration-200 shadow-sm"
             id="folio" 
-            placeholder="Ej: BDR-2024-12345" 
+            placeholder="Ej: 20250001" 
             type="text" />
         </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1" for="telefono">Número de Teléfono</label>
+          <input 
+            [(ngModel)]="telefono"
+            name="telefono"
+            class="w-full px-3 sm:px-4 py-2.5 sm:py-3 text-sm sm:text-base rounded-md border-slate-300 focus:ring-blue-600 focus:border-blue-600 transition-shadow duration-200 shadow-sm"
+            id="telefono" 
+            placeholder="Ej: 2291234567" 
+            type="tel" 
+            maxlength="10" />
+        </div>
+      </div>
+      <div class="flex justify-center mb-8 sm:mb-10">
         <button 
           (click)="buscarReporte()"
-          [disabled]="loading"
-          class="w-full sm:w-auto flex items-center justify-center gap-2 px-6 py-3 bg-blue-600 text-white font-semibold rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-600 transition-colors duration-200 shadow-sm whitespace-nowrap disabled:opacity-50">
-          <svg *ngIf="!loading" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          [disabled]="loading || !folio.trim() || !telefono.trim()"
+          class="flex items-center justify-center gap-2 px-6 sm:px-8 py-2.5 sm:py-3 bg-blue-600 text-white font-semibold rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-600 transition-colors duration-200 shadow-sm disabled:opacity-50 disabled:cursor-not-allowed text-sm sm:text-base">
+          <svg *ngIf="!loading" class="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
             <path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
           </svg>
-          <div *ngIf="loading" class="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
-          <span>{{ loading ? 'Buscando...' : 'Buscar' }}</span>
+          <div *ngIf="loading" class="animate-spin rounded-full h-4 w-4 sm:h-5 sm:w-5 border-b-2 border-white"></div>
+          <span>{{ loading ? 'Buscando...' : 'Buscar Reporte' }}</span>
         </button>
       </div>
       
-      <div *ngIf="reporteEncontrado && reporte" class="border-t border-slate-200 pt-8">
-        <h3 class="text-2xl font-bold text-slate-900 mb-6">Detalles del Reporte</h3>
-        <div class="space-y-6">
-          <div class="flex flex-col sm:flex-row">
-            <p class="w-full sm:w-1/3 text-gray-500 font-medium">Folio</p>
-            <p class="w-full sm:w-2/3 text-gray-700 font-semibold">{{ reporte.folio }}</p>
+      <div *ngIf="reporteEncontrado && reporte" class="border-t border-slate-200 pt-6 sm:pt-8">
+        <h3 class="text-xl sm:text-2xl font-bold text-slate-900 mb-4 sm:mb-6">Detalles del Reporte</h3>
+        <div class="space-y-4 sm:space-y-6">
+          <div class="flex flex-col sm:flex-row sm:items-center">
+            <p class="w-full sm:w-1/3 text-gray-500 font-medium text-sm sm:text-base mb-1 sm:mb-0">Folio</p>
+            <p class="w-full sm:w-2/3 text-gray-700 font-semibold text-sm sm:text-base">{{ reporte.folio }}</p>
           </div>
-          <div class="flex flex-col sm:flex-row">
-            <p class="w-full sm:w-1/3 text-gray-500 font-medium">Estado</p>
+          <div class="flex flex-col sm:flex-row sm:items-center">
+            <p class="w-full sm:w-1/3 text-gray-500 font-medium text-sm sm:text-base mb-1 sm:mb-0">Estado</p>
             <div class="w-full sm:w-2/3 flex items-center gap-2">
-              <span class="px-3 py-1 text-sm font-semibold text-yellow-800 bg-yellow-100 rounded-full">
+              <span class="px-2 sm:px-3 py-1 text-xs sm:text-sm font-semibold text-yellow-800 bg-yellow-100 rounded-full">
                 {{ getStatusText(reporte.estado) }}
               </span>
             </div>
           </div>
-          <div class="flex flex-col sm:flex-row">
-            <p class="w-full sm:w-1/3 text-gray-500 font-medium">Fecha de Reporte</p>
-            <p class="w-full sm:w-2/3 text-gray-700">{{ formatearFecha(reporte.fechaCreacion) }}</p>
+          <div class="flex flex-col sm:flex-row sm:items-center">
+            <p class="w-full sm:w-1/3 text-gray-500 font-medium text-sm sm:text-base mb-1 sm:mb-0">Fecha de Reporte</p>
+            <p class="w-full sm:w-2/3 text-gray-700 text-sm sm:text-base">{{ formatearFecha(reporte.fechaCreacion) }}</p>
+          </div>
+          <div class="flex flex-col sm:flex-row sm:items-center">
+            <p class="w-full sm:w-1/3 text-gray-500 font-medium text-sm sm:text-base mb-1 sm:mb-0">Tipo de Servicio</p>
+            <p class="w-full sm:w-2/3 text-gray-700 text-sm sm:text-base">{{ getTipoServicioText(reporte.tipoServicio) }}</p>
           </div>
           <div class="flex flex-col sm:flex-row">
-            <p class="w-full sm:w-1/3 text-gray-500 font-medium">Tipo de Servicio</p>
-            <p class="w-full sm:w-2/3 text-gray-700">{{ getTipoServicioText(reporte.tipoServicio) }}</p>
-          </div>
-          <div class="flex flex-col sm:flex-row">
-            <p class="w-full sm:w-1/3 text-gray-500 font-medium">Comentarios</p>
-            <p class="w-full sm:w-2/3 text-gray-700 leading-relaxed">{{ reporte.comentarios }}</p>
+            <p class="w-full sm:w-1/3 text-gray-500 font-medium text-sm sm:text-base mb-1 sm:mb-0">Comentarios</p>
+            <p class="w-full sm:w-2/3 text-gray-700 leading-relaxed text-sm sm:text-base">{{ reporte.comentarios }}</p>
           </div>
           <div *ngIf="reporte.direccion" class="flex flex-col sm:flex-row">
-            <p class="w-full sm:w-1/3 text-gray-500 font-medium">Dirección</p>
-            <p class="w-full sm:w-2/3 text-gray-700">{{ reporte.direccion }}</p>
+            <p class="w-full sm:w-1/3 text-gray-500 font-medium text-sm sm:text-base mb-1 sm:mb-0">Dirección</p>
+            <p class="w-full sm:w-2/3 text-gray-700 text-sm sm:text-base">{{ reporte.direccion }}</p>
           </div>
         </div>
       </div>
       
-      <div *ngIf="!reporteEncontrado && folioConsultado" class="border-t border-slate-200 pt-8 text-center">
-        <p class="text-gray-500">No se encontró ningún reporte con el folio proporcionado.</p>
+      <div *ngIf="!reporteEncontrado && folioConsultado" class="border-t border-slate-200 pt-6 sm:pt-8 text-center">
+        <p class="text-gray-500 text-sm sm:text-base">No se encontró ningún reporte con el folio y teléfono proporcionados. Verifica que los datos sean correctos.</p>
       </div>
     </div>
   </main>

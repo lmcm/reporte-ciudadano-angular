@@ -1,14 +1,16 @@
 <div class="flex min-h-screen flex-col bg-slate-50">
-  <header class="sticky top-0 z-10 flex items-center justify-between border-b border-slate-200 bg-white px-6 py-4 shadow-sm">
-    <div class="flex items-center gap-4">
+  <header class="sticky top-0 z-10 flex items-center justify-between border-b border-slate-200 bg-white px-4 sm:px-6 py-4 shadow-sm">
+    <div class="flex items-center gap-3">
       <div class="text-blue-600">
-        <svg class="h-8 w-8" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+        <svg class="h-6 w-6 sm:h-8 sm:w-8" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
           <path d="M12 2L2 7l10 5 10-5L12 2zm0 7.5L4 5.5l8-4 8 4-8 4zM2 17l10 5 10-5-10-5-10 5zm0-2.5l8 4 8-4-8-4-8 4z"></path>
         </svg>
       </div>
-      <h1 class="text-xl font-bold text-slate-800">Ayuntamiento de Boca del Río</h1>
+      <h1 class="text-lg sm:text-xl font-bold text-slate-800">Ayuntamiento de Boca del Río</h1>
     </div>
-    <nav class="flex items-center gap-8">
+    
+    <!-- Menú desktop -->
+    <nav class="hidden md:flex items-center gap-8">
       <a routerLink="/inicio" class="text-slate-600 text-base font-medium leading-normal hover:text-blue-600 transition-colors">Inicio</a>
       <a class="text-sm font-semibold text-blue-600" href="#">Servicios</a>
       <a class="text-sm font-medium text-slate-600 hover:text-blue-600" href="#">Reportes</a>
@@ -23,13 +25,79 @@
         <img alt="User avatar" class="h-10 w-10 rounded-full" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAoRwLcmsLGQU7FfYkkhFTQIKXoVxzBn1ezSBI-Ff7oSRXwsq4VzJSBKwsLPwszCRrMbSZQ04WBstK-ji14V1MJtU1nChbu7LYGLS6A3CNmdOq7LJy-RGW3EFSqT1732jsWC38f-TLN2L41k8QT5y1RD3JyXlcbXFlT9iYx_APfw6GnuYkifRJQuq8jDCXSmCxVLuGKtLvAy1ZWOAFIuPpEvIWumAwGTJU_0Ba9v5LJ6kK91OmicBjy4s8id5WLz8PXGS0T0Yv8bWQa" />
       </div>
     </nav>
+    
+    <div class="flex md:hidden items-center gap-3">
+      <button class="relative rounded-full p-2 text-slate-500 hover:bg-slate-100 hover:text-slate-700">
+        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 256 256" xmlns="http://www.w3.org/2000/svg">
+          <path d="M221.8,175.94C216.25,166.38,208,139.33,208,104a80,80,0,1,0-160,0c0,35.34-8.26,62.38-13.81,71.94A16,16,0,0,0,48,200H88.81a40,40,0,0,0,78.38,0H208a16,16,0,0,0,13.8-24.06ZM128,216a24,24,0,0,1-22.62-16h45.24A24,24,0,0,1,128,216ZM48,184c7.7-13.24,16-43.92,16-80a64,64,0,1,1,128,0c0,36.05,8.28,66.73,16,80Z"></path>
+        </svg>
+        <span class="absolute top-1 right-1 h-2 w-2 rounded-full bg-red-500"></span>
+      </button>
+      <img alt="User avatar" class="h-8 w-8 rounded-full" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAoRwLcmsLGQU7FfYkkhFTQIKXoVxzBn1ezSBI-Ff7oSRXwsq4VzJSBKwsLPwszCRrMbSZQ04WBstK-ji14V1MJtU1nChbu7LYGLS6A3CNmdOq7LJy-RGW3EFSqT1732jsWC38f-TLN2L41k8QT5y1RD3JyXlcbXFlT9iYx_APfw6GnuYkifRJQuq8jDCXSmCxVLuGKtLvAy1ZWOAFIuPpEvIWumAwGTJU_0Ba9v5LJ6kK91OmicBjy4s8id5WLz8PXGS0T0Yv8bWQa" />
+      <button (click)="toggleMobileMenu()" class="p-2 rounded-md hover:bg-slate-100 focus:outline-none focus:ring-2 focus:ring-blue-500">
+        <svg class="h-6 w-6 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+        </svg>
+      </button>
+    </div>
   </header>
+
+  <!-- Overlay del menú móvil -->
+  <div *ngIf="showMobileMenu" class="md:hidden fixed inset-0 z-50 bg-black bg-opacity-50" (click)="closeMobileMenu()"></div>
   
-  <main class="flex-1 bg-gray-50 p-6 lg:p-10">
+  <!-- Menú móvil -->
+  <div *ngIf="showMobileMenu" class="md:hidden fixed inset-y-0 left-0 z-50 w-64 bg-white shadow-lg transform transition-transform duration-300 ease-in-out">
+    <div class="flex h-full flex-col p-4">
+      <div class="flex items-center justify-between mb-8">
+        <div class="flex items-center gap-3">
+          <div class="text-blue-600">
+            <svg class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              <path d="M12 2L2 7l10 5 10-5L12 2zm0 7.5L4 5.5l8-4 8 4-8 4zM2 17l10 5 10-5-10-5-10 5zm0-2.5l8 4 8-4-8-4-8 4z"></path>
+            </svg>
+          </div>
+          <h1 class="text-lg font-bold text-slate-800">Ayuntamiento</h1>
+        </div>
+        <button (click)="closeMobileMenu()" class="p-2 rounded-md hover:bg-slate-100 focus:outline-none focus:ring-2 focus:ring-blue-500">
+          <svg class="h-5 w-5 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+          </svg>
+        </button>
+      </div>
+      
+      <nav class="flex flex-col gap-4">
+        <a routerLink="/inicio" (click)="closeMobileMenu()" class="flex items-center gap-3 px-3 py-3 text-slate-700 hover:bg-slate-100 rounded-lg transition-colors">
+          <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path>
+          </svg>
+          <span class="font-medium">Inicio</span>
+        </a>
+        <a href="#" (click)="closeMobileMenu()" class="flex items-center gap-3 px-3 py-3 text-slate-900 bg-slate-100 rounded-lg">
+          <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
+          </svg>
+          <span class="font-medium">Servicios</span>
+        </a>
+        <a href="#" (click)="closeMobileMenu()" class="flex items-center gap-3 px-3 py-3 text-slate-700 hover:bg-slate-100 rounded-lg transition-colors">
+          <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+          </svg>
+          <span class="font-medium">Reportes</span>
+        </a>
+        <a href="#" (click)="closeMobileMenu()" class="flex items-center gap-3 px-3 py-3 text-slate-700 hover:bg-slate-100 rounded-lg transition-colors">
+          <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
+          </svg>
+          <span class="font-medium">Contacto</span>
+        </a>
+      </nav>
+    </div>
+  </div>
+  
+  <main class="flex-1 bg-gray-50 p-4 sm:p-6 lg:p-10">
     <div class="mx-auto max-w-7xl">
-      <div class="mb-8 flex flex-wrap items-center justify-between gap-4">
-        <h2 class="text-3xl font-bold text-slate-900">Reportes Ciudadanos</h2>
-        <button class="flex items-center gap-2 rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-blue-700">
+      <div class="mb-6 sm:mb-8 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <h2 class="text-2xl sm:text-3xl font-bold text-slate-900">Reportes Ciudadanos</h2>
+        <button class="flex items-center justify-center gap-2 rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-blue-700">
           <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
             <path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd"></path>
           </svg>
@@ -37,9 +105,9 @@
         </button>
       </div>
       
-      <div class="mb-6 flex flex-wrap items-center gap-4 rounded-lg border border-slate-200 bg-white p-4">
+      <div class="mb-4 sm:mb-6 flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4 rounded-lg border border-slate-200 bg-white p-3 sm:p-4">
         <h3 class="text-sm font-medium text-slate-600">Filtros:</h3>
-        <div class="flex flex-wrap gap-2">
+        <div class="flex flex-col sm:flex-row flex-wrap gap-2">
           <select class="appearance-none rounded-md border border-gray-300 bg-white py-2 pl-3 pr-8 text-sm text-slate-700 focus:border-blue-600 focus:outline-none focus:ring-1 focus:ring-blue-600">
             <option>Estado: Todos</option>
             <option>Pendiente</option>
@@ -65,7 +133,7 @@
         </div>
         
         <!-- Error -->
-        <div *ngIf="error" class="bg-red-50 border border-red-200 rounded-lg p-4 mb-4">
+        <div *ngIf="error" class="bg-red-50 border border-red-200 rounded-lg p-4 m-4">
           <div class="flex items-center">
             <svg class="h-5 w-5 text-red-400 mr-2" fill="currentColor" viewBox="0 0 20 20">
               <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"></path>
@@ -74,29 +142,30 @@
           </div>
         </div>
         
-        <table *ngIf="!loading && !error" class="w-full text-left text-sm text-slate-700">
+        <!-- Vista de tabla para desktop -->
+        <table *ngIf="!loading && !error" class="hidden sm:table w-full text-left text-sm text-slate-700">
           <thead class="bg-slate-50 text-xs uppercase text-slate-500">
             <tr>
-              <th class="px-6 py-3 font-medium" scope="col">Folio</th>
-              <th class="px-6 py-3 font-medium" scope="col">Tipo de Servicio</th>
-              <th class="px-6 py-3 font-medium" scope="col">Ciudadano</th>
-              <th class="px-6 py-3 font-medium" scope="col">Estado</th>
-              <th class="px-6 py-3 font-medium" scope="col">Fecha de Creación</th>
-              <th class="px-6 py-3 font-medium text-center" scope="col">Acciones</th>
+              <th class="px-3 sm:px-6 py-3 font-medium" scope="col">Folio</th>
+              <th class="px-3 sm:px-6 py-3 font-medium" scope="col">Tipo de Servicio</th>
+              <th class="px-3 sm:px-6 py-3 font-medium" scope="col">Ciudadano</th>
+              <th class="px-3 sm:px-6 py-3 font-medium" scope="col">Estado</th>
+              <th class="px-3 sm:px-6 py-3 font-medium" scope="col">Fecha</th>
+              <th class="px-3 sm:px-6 py-3 font-medium text-center" scope="col">Acciones</th>
             </tr>
           </thead>
           <tbody>
             <tr *ngFor="let reporte of reportes" class="border-b border-slate-200 bg-white hover:bg-slate-50">
-              <td class="px-6 py-4 font-medium text-slate-900">{{ reporte.folio || 'Sin folio' }}</td>
-              <td class="px-6 py-4">{{ getTipoServicioText(reporte.tipoServicio) }}</td>
-              <td class="px-6 py-4">{{ formatearNombreCorto(reporte.ciudadanoNombre + ' ' + reporte.ciudadanoApellidos) }}</td>
-              <td class="px-6 py-4">
-                <span [ngClass]="getStatusClass(reporte.estado)" class="px-3 py-1 rounded-full text-xs font-medium">
+              <td class="px-3 sm:px-6 py-4 font-medium text-slate-900">{{ reporte.folio || 'Sin folio' }}</td>
+              <td class="px-3 sm:px-6 py-4">{{ getTipoServicioText(reporte.tipoServicio) }}</td>
+              <td class="px-3 sm:px-6 py-4">{{ formatearNombreCorto(reporte.ciudadanoNombre + ' ' + reporte.ciudadanoApellidos) }}</td>
+              <td class="px-3 sm:px-6 py-4">
+                <span [ngClass]="getStatusClass(reporte.estado)" class="px-2 sm:px-3 py-1 rounded-full text-xs font-medium">
                   {{ getStatusText(reporte.estado) }}
                 </span>
               </td>
-              <td class="px-6 py-4 text-slate-600">{{ formatearFecha(reporte.fechaCreacion) }}</td>
-              <td class="px-6 py-4 text-center">
+              <td class="px-3 sm:px-6 py-4 text-slate-600">{{ formatearFecha(reporte.fechaCreacion) }}</td>
+              <td class="px-3 sm:px-6 py-4 text-center">
                 <button 
                   (click)="verDetalle(reporte.id!)"
                   class="text-sm font-medium text-blue-600 hover:underline">
@@ -106,25 +175,47 @@
             </tr>
           </tbody>
         </table>
+        
+        <!-- Vista de tarjetas para móvil -->
+        <div *ngIf="!loading && !error" class="sm:hidden divide-y divide-slate-200">
+          <div *ngFor="let reporte of reportes" class="p-4 hover:bg-slate-50">
+            <div class="flex justify-between items-start mb-2">
+              <div class="font-medium text-slate-900">{{ reporte.folio || 'Sin folio' }}</div>
+              <span [ngClass]="getStatusClass(reporte.estado)" class="px-2 py-1 rounded-full text-xs font-medium">
+                {{ getStatusText(reporte.estado) }}
+              </span>
+            </div>
+            <div class="text-sm text-slate-600 mb-1">{{ getTipoServicioText(reporte.tipoServicio) }}</div>
+            <div class="text-sm text-slate-600 mb-2">{{ formatearNombreCorto(reporte.ciudadanoNombre + ' ' + reporte.ciudadanoApellidos) }}</div>
+            <div class="flex justify-between items-center">
+              <span class="text-xs text-slate-500">{{ formatearFecha(reporte.fechaCreacion) }}</span>
+              <button 
+                (click)="verDetalle(reporte.id!)"
+                class="text-sm font-medium text-blue-600 hover:underline">
+                Ver Detalles
+              </button>
+            </div>
+          </div>
+        </div>
       </div>
       
-      <nav aria-label="Table navigation" class="mt-6 flex items-center justify-between">
-        <span class="text-sm font-normal text-slate-500">
+      <nav aria-label="Table navigation" class="mt-4 sm:mt-6 flex flex-col sm:flex-row items-center justify-between gap-3">
+        <span class="text-xs sm:text-sm font-normal text-slate-500 order-2 sm:order-1">
           Mostrando <span class="font-semibold text-slate-900">1-8</span> de 
           <span class="font-semibold text-slate-900">{{ reportes.length }}</span>
         </span>
-        <ul class="inline-flex h-8 -space-x-px text-sm">
+        <ul class="inline-flex h-8 -space-x-px text-sm order-1 sm:order-2">
           <li>
-            <a class="ml-0 flex h-8 items-center justify-center rounded-l-lg border border-gray-300 bg-white px-3 leading-tight text-gray-500 hover:bg-gray-100 hover:text-gray-700" href="#">Anterior</a>
+            <a class="ml-0 flex h-8 items-center justify-center rounded-l-lg border border-gray-300 bg-white px-2 sm:px-3 leading-tight text-gray-500 hover:bg-gray-100 hover:text-gray-700" href="#">Anterior</a>
           </li>
           <li>
-            <a class="flex h-8 items-center justify-center border border-gray-300 bg-white px-3 leading-tight text-gray-500 hover:bg-gray-100 hover:text-gray-700" href="#">1</a>
+            <a class="flex h-8 items-center justify-center border border-gray-300 bg-white px-2 sm:px-3 leading-tight text-gray-500 hover:bg-gray-100 hover:text-gray-700" href="#">1</a>
           </li>
           <li>
-            <a class="flex h-8 items-center justify-center border border-gray-300 bg-white px-3 leading-tight text-gray-500 hover:bg-gray-100 hover:text-gray-700" href="#">2</a>
+            <a class="flex h-8 items-center justify-center border border-gray-300 bg-white px-2 sm:px-3 leading-tight text-gray-500 hover:bg-gray-100 hover:text-gray-700" href="#">2</a>
           </li>
           <li>
-            <a class="flex h-8 items-center justify-center rounded-r-lg border border-gray-300 bg-white px-3 leading-tight text-gray-500 hover:bg-gray-100 hover:text-gray-700" href="#">Siguiente</a>
+            <a class="flex h-8 items-center justify-center rounded-r-lg border border-gray-300 bg-white px-2 sm:px-3 leading-tight text-gray-500 hover:bg-gray-100 hover:text-gray-700" href="#">Siguiente</a>
           </li>
         </ul>
       </nav>

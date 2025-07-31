@@ -1,7 +1,79 @@
 <div class="relative flex size-full min-h-screen flex-col group/design-root overflow-x-hidden" style="font-family: 'Public Sans', 'Noto Sans', sans-serif">
+  <!-- Header móvil -->
+  <header class="lg:hidden bg-white border-b border-slate-200 px-4 py-3">
+    <div class="flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <img alt="Boca del Rio Logo" class="h-8 w-auto" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDhbmmOhCJurvh2Vhe6_IXryb1UyawMdnaE2Cxckexs0OHKQ632Gk4Ph8HiV0IuihfTgQryk4gcTeFxS7q-U4U4wcuQFkIDc2teSoEVawQSBas67jZpaISxSaRGql8HxGOhk5joIAXro_0tTAQCv3JjQ744RxH7K1-iwGOUxCEdwTZErqlRm0u422NyiPgCpP7gTY6zzZFLhmDasAx2RZUdBr02ONZ1qyuw68VPJSVXtzru-792CQOjt9eGO1bGtrS8hgTrE7Bjp39L" />
+        <h1 class="text-lg font-bold text-slate-800">Boca del Río</h1>
+      </div>
+      <button (click)="toggleMobileMenu()" class="p-2 rounded-md hover:bg-slate-100 focus:outline-none focus:ring-2 focus:ring-blue-500">
+        <svg class="h-6 w-6 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+        </svg>
+      </button>
+    </div>
+  </header>
+
+  <!-- Overlay del menú móvil -->
+  <div *ngIf="showMobileMenu" class="lg:hidden fixed inset-0 z-50 bg-black bg-opacity-50" (click)="closeMobileMenu()"></div>
+  
+  <!-- Menú móvil -->
+  <div *ngIf="showMobileMenu" class="lg:hidden fixed inset-y-0 left-0 z-50 w-64 bg-white shadow-lg transform transition-transform duration-300 ease-in-out">
+    <div class="flex h-full flex-col justify-between p-4">
+      <div class="flex flex-col gap-8">
+        <div class="flex items-center justify-between">
+          <div class="flex items-center gap-3">
+            <img alt="Boca del Rio Logo" class="h-8 w-auto" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDhbmmOhCJurvh2Vhe6_IXryb1UyawMdnaE2Cxckexs0OHKQ632Gk4Ph8HiV0IuihfTgQryk4gcTeFxS7q-U4U4wcuQFkIDc2teSoEVawQSBas67jZpaISxSaRGql8HxGOhk5joIAXro_0tTAQCv3JjQ744RxH7K1-iwGOUxCEdwTZErqlRm0u422NyiPgCpP7gTY6zzZFLhmDasAx2RZUdBr02ONZ1qyuw68VPJSVXtzru-792CQOjt9eGO1bGtrS8hgTrE7Bjp39L" />
+            <h1 class="text-lg font-bold text-slate-800">Boca del Río</h1>
+          </div>
+          <button (click)="closeMobileMenu()" class="p-2 rounded-md hover:bg-slate-100 focus:outline-none focus:ring-2 focus:ring-blue-500">
+            <svg class="h-5 w-5 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+            </svg>
+          </button>
+        </div>
+        <nav class="flex flex-col gap-2">
+          <a routerLink="/inicio" (click)="closeMobileMenu()" class="flex items-center gap-3 px-3 py-2 text-slate-700 hover:bg-slate-100 rounded-lg">
+            <svg fill="currentColor" height="24" viewBox="0 0 256 256" width="24" xmlns="http://www.w3.org/2000/svg">
+              <path d="M218.83,103.77l-80-75.48a1.14,1.14,0,0,1-.11-.11,16,16,0,0,0-21.53,0l-.11.11L37.17,103.77A16,16,0,0,0,32,115.55V208a16,16,0,0,0,16,16H96a16,16,0,0,0,16-16V160h32v48a16,16,0,0,0,16,16h48a16,16,0,0,0,16-16V115.55A16,16,0,0,0,218.83,103.77ZM208,208H160V160a16,16,0,0,0-16-16H112a16,16,0,0,0-16,16v48H48V115.55l.11-.1L128,40l79.9,75.43.11.1Z"></path>
+            </svg>
+            <span class="text-sm font-medium">Home</span>
+          </a>
+          <a routerLink="/mis-reportes" (click)="closeMobileMenu()" class="flex items-center gap-3 px-3 py-2 text-slate-900 bg-slate-100 rounded-lg">
+            <svg fill="currentColor" height="24" viewBox="0 0 256 256" width="24" xmlns="http://www.w3.org/2000/svg">
+              <path d="M213.66,82.34l-56-56A8,8,0,0,0,152,24H56A16,16,0,0,0,40,40V216a16,16,0,0,0,16,16H200a16,16,0,0,0,16-16V88A8,8,0,0,0,213.66,82.34ZM160,51.31,188.69,80H160ZM200,216H56V40h88V88a8,8,0,0,0,8,8h48V216Z"></path>
+            </svg>
+            <span class="text-sm font-medium">Mis Reportes</span>
+          </a>
+          <a routerLink="/nuevo-reporte" (click)="closeMobileMenu()" class="flex items-center gap-3 px-3 py-2 text-slate-700 hover:bg-slate-100 rounded-lg">
+            <svg fill="currentColor" height="24" viewBox="0 0 256 256" width="24" xmlns="http://www.w3.org/2000/svg">
+              <path d="M224,128a8,8,0,0,1-8,8H136v80a8,8,0,0,1-16,0V136H40a8,8,0,0,1,0-16h80V40a8,8,0,0,1,16,0v80h80A8,8,0,0,1,224,128Z"></path>
+            </svg>
+            <span class="text-sm font-medium">Nuevo reporte</span>
+          </a>
+        </nav>
+      </div>
+      <div class="flex flex-col gap-2 border-t pt-4">
+        <div class="flex items-center gap-3 px-3 py-2">
+          <div class="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-10" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuBzCk9tQA3K0yvJXfu4g26POR8UxC0CbUBmoL6JZm1IHD7ej0BnWC_tTwzFlWPCrh2_nM0Z2peLkt99lFsyWZK9qKLwajBCnr8kKA7ZCMJYuCCW1Xz_YivxIFAjzsXEOiTWc7d3TlILuD0xDUO2RDojAWsDrmYQg58-Ii4kuxTDNdabMiUd-W0_Mp8sjP_JUplDBtg1A-aV6iCS5XpV0EFMi42RIVpHhsUgTao5bUxDgOBKC4ZJkmxUkHoncuvWCcEAsceaPWSxID5v');"></div>
+          <div class="flex flex-col">
+            <p class="text-slate-900 text-sm font-semibold">{{ currentUser?.nombre || 'Usuario' }}</p>
+            <p class="text-xs text-slate-500">Ver perfil</p>
+          </div>
+        </div>
+        <button (click)="logout(); closeMobileMenu()" class="flex items-center gap-3 px-3 py-2 text-slate-700 hover:bg-red-50 hover:text-red-700 rounded-lg transition-colors w-full mt-2">
+          <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
+          </svg>
+          <span class="text-sm font-medium">Cerrar sesión</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
   <div class="layout-container flex h-full grow flex-col">
     <div class="flex flex-1">
-      <aside class="w-64 flex-shrink-0 bg-white border-r border-slate-200">
+      <aside class="hidden lg:block w-64 flex-shrink-0 bg-white border-r border-slate-200">
         <div class="flex h-full flex-col justify-between p-4">
           <div class="flex flex-col gap-8">
             <div class="flex items-center gap-3 px-3">
@@ -53,27 +125,27 @@
         </div>
       </aside>
       
-      <main class="flex-1 p-8">
+      <main class="flex-1 p-4 lg:p-8">
         <div class="max-w-4xl mx-auto">
           <div class="mb-8">
-            <h1 class="text-4xl font-bold text-slate-800">Mis Reportes</h1>
+            <h1 class="text-2xl sm:text-3xl lg:text-4xl font-bold text-slate-800">Mis Reportes</h1>
             <p class="text-slate-500 mt-1">Consulta y gestiona todos los reportes que has enviado.</p>
           </div>
           
           <div class="bg-white p-6 rounded-2xl shadow-sm mb-8">
-            <div class="flex items-center gap-6">
+            <div class="flex flex-col sm:flex-row items-center gap-4 sm:gap-6">
               <div class="relative">
-                <div class="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-24" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuCfOs-idp0qBCGjuGjXV6RK2nyFuwMM5xvm2BFG8nmEyd3hOdnT-Jg5I3ryQqnrnKzCek03JrOaIps0l1kz-SOs46_mxpn-86tLYHBsemHpam_Ux8mTXT_TZdgdqYGL3quAWlMLAgeMUeCVWZGTASwXJydX4Yc0Vc9AtGA0NVaek4NRX0jm92vNJoNeUmey7zhZcIH276prnNh9PUtNAzSHTl-Fl7vYa6PjFYQodh6U4q_RfFyo6Zkl7TPx4a5VWXM9fqWEDh8OZtw6');"></div>
+                <div class="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-16 sm:size-20 lg:size-24" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuCfOs-idp0qBCGjuGjXV6RK2nyFuwMM5xvm2BFG8nmEyd3hOdnT-Jg5I3ryQqnrnKzCek03JrOaIps0l1kz-SOs46_mxpn-86tLYHBsemHpam_Ux8mTXT_TZdgdqYGL3quAWlMLAgeMUeCVWZGTASwXJydX4Yc0Vc9AtGA0NVaek4NRX0jm92vNJoNeUmey7zhZcIH276prnNh9PUtNAzSHTl-Fl7vYa6PjFYQodh6U4q_RfFyo6Zkl7TPx4a5VWXM9fqWEDh8OZtw6');"></div>
                 <button (click)="toggleEditProfile()" class="absolute bottom-0 right-0 bg-blue-500 text-white rounded-full p-1.5 hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
                   <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                     <path d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.5L14.732 3.732z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
                   </svg>
                 </button>
               </div>
-              <div>
-                <h2 class="text-2xl font-bold text-slate-800">{{ currentUser?.nombre }} {{ currentUser?.apellidos }}</h2>
-                <p class="text-slate-500">{{ currentUser?.email }}</p>
-                <p class="text-slate-500 text-sm">Miembro desde {{ currentUser?.fechaRegistro | date:'yyyy' }}</p>
+              <div class="text-center sm:text-left">
+                <h2 class="text-xl sm:text-2xl font-bold text-slate-800">{{ currentUser?.nombre }} {{ currentUser?.apellidos }}</h2>
+                <p class="text-slate-500 text-sm sm:text-base">{{ currentUser?.email }}</p>
+                <p class="text-slate-500 text-xs sm:text-sm">Miembro desde {{ currentUser?.fechaRegistro | date:'yyyy' }}</p>
               </div>
             </div>
             
@@ -153,11 +225,11 @@
           </div>
           
           <div class="bg-white p-6 rounded-2xl shadow-sm">
-            <div class="flex justify-between items-center mb-6">
+            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
               <h3 class="text-xl font-bold text-slate-800">Mis Reportes</h3>
               <button 
                 (click)="recargarReportes()" 
-                class="flex items-center gap-2 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                class="flex items-center gap-2 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 w-full sm:w-auto justify-center"
                 [disabled]="loading">
                 <svg *ngIf="!loading" class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
@@ -198,8 +270,8 @@
               </a>
             </div>
             
-            <!-- Tabla de reportes -->
-            <div *ngIf="!loading && !error && reportes.length > 0" class="overflow-x-auto">
+            <!-- Vista de tabla para desktop -->
+            <div *ngIf="!loading && !error && reportes.length > 0" class="hidden lg:block overflow-x-auto">
               <table class="w-full text-left">
                 <thead>
                   <tr class="border-b border-slate-200">
@@ -250,6 +322,43 @@
                   </tr>
                 </tbody>
               </table>
+            </div>
+            
+            <!-- Vista de tarjetas para móvil y tablet -->
+            <div *ngIf="!loading && !error && reportes.length > 0" class="lg:hidden space-y-4">
+              <div *ngFor="let reporte of reportes" class="bg-slate-50 rounded-lg p-4 border border-slate-200">
+                <div class="flex justify-between items-start mb-3">
+                  <div>
+                    <h4 class="font-semibold text-slate-900 text-sm">{{ reporte.folio || 'Sin folio' }}</h4>
+                    <p class="text-xs text-slate-500">{{ formatearFecha(reporte.fechaCreacion) }}</p>
+                  </div>
+                  <div class="flex flex-col items-end gap-1">
+                    <span [ngClass]="getStatusClass(reporte.estado)" class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium">
+                      {{ getStatusText(reporte.estado) }}
+                    </span>
+                    <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium"
+                          [ngClass]="{
+                            'bg-red-100 text-red-800': reporte.prioridad === 'critica',
+                            'bg-orange-100 text-orange-800': reporte.prioridad === 'alta',
+                            'bg-yellow-100 text-yellow-800': reporte.prioridad === 'media',
+                            'bg-green-100 text-green-800': reporte.prioridad === 'baja'
+                          }">
+                      {{ reporte.prioridad | titlecase }}
+                    </span>
+                  </div>
+                </div>
+                <div class="mb-3">
+                  <p class="font-medium text-slate-800 text-sm mb-1">{{ getTipoServicioText(reporte.tipoServicio) }}</p>
+                  <p class="text-slate-600 text-xs line-clamp-2">{{ reporte.direccion }}</p>
+                </div>
+                <div class="flex justify-end">
+                  <button 
+                    (click)="verDetalle(reporte.id!)" 
+                    class="text-blue-500 font-semibold text-sm hover:underline focus:outline-none focus:underline">
+                    Ver Detalles
+                  </button>
+                </div>
+              </div>
             </div>
             
             <!-- Resumen -->

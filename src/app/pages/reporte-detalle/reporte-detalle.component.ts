@@ -24,6 +24,7 @@ export class ReporteDetalleComponent implements OnInit, OnDestroy {
   private route = inject(ActivatedRoute);
   private router = inject(Router);
   
+  showMobileMenu = false;
   reporteId = '';
   reporte: Reporte | null = null;
   comentarios: Comentario[] = [];
@@ -230,6 +231,14 @@ export class ReporteDetalleComponent implements OnInit, OnDestroy {
       hour: '2-digit',
       minute: '2-digit'
     });
+  }
+
+  toggleMobileMenu() {
+    this.showMobileMenu = !this.showMobileMenu;
+  }
+
+  closeMobileMenu() {
+    this.showMobileMenu = false;
   }
 
   guardarCambios() {

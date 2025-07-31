@@ -1,40 +1,116 @@
 <div class="relative flex size-full min-h-screen flex-col group/design-root overflow-x-hidden">
   <div class="layout-container flex h-full grow flex-col">
-    <header class="flex items-center justify-between whitespace-nowrap border-b border-solid border-slate-200 px-10 py-4">
-      <div class="flex items-center gap-3 text-slate-900">
-        <svg class="h-8 w-8 text-blue-600" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-          <path clip-rule="evenodd" d="M3 6C3 4.34315 4.34315 3 6 3H18C19.6569 3 21 4.34315 21 6V18C21 19.6569 19.6569 21 18 21H6C4.34315 21 3 19.6569 3 18V6ZM6 5C5.44772 5 5 5.44772 5 6V18C5 18.5523 5.44772 19 6 19H18C18.5523 19 19 18.5523 19 18V6C19 5.44772 18.5523 5 18 5H6ZM15.5 15.5H8.5V13.5H15.5V15.5ZM15.5 10.5H8.5V8.5H15.5V10.5Z" fill-rule="evenodd"></path>
-        </svg>
-        <h1 class="text-slate-900 text-xl font-bold tracking-tight">Ciudadano Boqueño</h1>
-      </div>
-      <nav class="hidden md:flex items-center gap-8">
-        <a routerLink="/inicio" class="text-slate-900 text-sm font-medium hover:text-blue-600 transition-colors">Inicio</a>
-        <a routerLink="/servicios" class="text-slate-900 text-sm font-medium hover:text-blue-600 transition-colors">Servicios</a>
-        <a href="#" class="text-slate-900 text-sm font-medium hover:text-blue-600 transition-colors">Nosotros</a>
-        <a href="#" class="text-slate-900 text-sm font-medium hover:text-blue-600 transition-colors">Contacto</a>
-      </nav>
-      <div class="flex gap-3">
-        <button class="flex min-w-[90px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-md h-10 px-5 bg-blue-600 text-slate-50 text-sm font-semibold tracking-wide shadow-sm hover:bg-blue-700 transition-colors">
-          <span class="truncate">Registrarse</span>
-        </button>
-        <button class="flex min-w-[90px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-md h-10 px-5 bg-slate-200 text-slate-900 text-sm font-semibold tracking-wide shadow-sm hover:bg-slate-300 transition-colors">
-          <span class="truncate">Iniciar Sesión</span>
-        </button>
+    <!-- Header responsivo -->
+    <header class="bg-white shadow-sm border-b border-slate-200">
+      <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex items-center justify-between h-16">
+          <div class="flex items-center gap-3">
+            <svg class="h-8 w-8 text-blue-600" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24">
+              <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+              <circle cx="12" cy="10" r="3"></circle>
+            </svg>
+            <h1 class="text-xl sm:text-2xl font-bold text-slate-900">Boca del Río</h1>
+          </div>
+          
+          <!-- Menú desktop -->
+          <div class="hidden md:flex flex-1 justify-end gap-6">
+            <nav class="flex items-center gap-8">
+              <a routerLink="/inicio" routerLinkActive="text-blue-600" class="text-slate-600 text-base font-medium leading-normal hover:text-blue-600 transition-colors">Inicio</a>
+              <a routerLink="/servicios" routerLinkActive="text-blue-600" class="text-slate-600 text-base font-medium leading-normal hover:text-blue-600 transition-colors">Servicios</a>
+              <a href="#" class="text-slate-600 text-base font-medium leading-normal hover:text-blue-600 transition-colors">Nosotros</a>
+              <a href="#" class="text-slate-600 text-base font-medium leading-normal hover:text-blue-600 transition-colors">Contacto</a>
+            </nav>
+            <div class="flex items-center gap-3">
+              <button (click)="toggleMode()" [class]="!isLoginMode ? 'bg-blue-600 text-white hover:bg-blue-700' : 'bg-slate-200 text-slate-900 hover:bg-slate-300'" class="px-4 py-2 rounded-md text-sm font-semibold transition-colors">
+                Registrarse
+              </button>
+              <button (click)="toggleMode()" [class]="isLoginMode ? 'bg-blue-600 text-white hover:bg-blue-700' : 'bg-slate-200 text-slate-900 hover:bg-slate-300'" class="px-4 py-2 rounded-md text-sm font-semibold transition-colors">
+                Iniciar Sesión
+              </button>
+            </div>
+          </div>
+          
+          <!-- Botón menú móvil -->
+          <button (click)="toggleMobileMenu()" class="md:hidden p-2 rounded-md hover:bg-slate-100 focus:outline-none focus:ring-2 focus:ring-blue-500">
+            <svg class="h-6 w-6 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+            </svg>
+          </button>
+        </div>
       </div>
     </header>
+
+    <!-- Overlay del menú móvil -->
+    <div *ngIf="showMobileMenu" class="md:hidden fixed inset-0 z-50 bg-black bg-opacity-50" (click)="closeMobileMenu()"></div>
     
-    <main class="flex flex-1 items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+    <!-- Menú móvil -->
+    <div *ngIf="showMobileMenu" class="md:hidden fixed inset-y-0 left-0 z-50 w-64 bg-white shadow-lg transform transition-transform duration-300 ease-in-out">
+      <div class="flex h-full flex-col p-4">
+        <div class="flex items-center justify-between mb-8">
+          <div class="flex items-center gap-3">
+            <svg class="h-6 w-6 text-blue-600" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24">
+              <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+              <circle cx="12" cy="10" r="3"></circle>
+            </svg>
+            <h1 class="text-lg font-bold text-slate-800">Boca del Río</h1>
+          </div>
+          <button (click)="closeMobileMenu()" class="p-2 rounded-md hover:bg-slate-100 focus:outline-none focus:ring-2 focus:ring-blue-500">
+            <svg class="h-5 w-5 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+            </svg>
+          </button>
+        </div>
+        
+        <nav class="flex flex-col gap-4">
+          <a routerLink="/inicio" (click)="closeMobileMenu()" class="flex items-center gap-3 px-3 py-3 text-slate-700 hover:bg-slate-100 rounded-lg transition-colors">
+            <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path>
+            </svg>
+            <span class="font-medium">Inicio</span>
+          </a>
+          <a routerLink="/servicios" (click)="closeMobileMenu()" class="flex items-center gap-3 px-3 py-3 text-slate-700 hover:bg-slate-100 rounded-lg transition-colors">
+            <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
+            </svg>
+            <span class="font-medium">Servicios</span>
+          </a>
+          <a href="#" (click)="closeMobileMenu()" class="flex items-center gap-3 px-3 py-3 text-slate-700 hover:bg-slate-100 rounded-lg transition-colors">
+            <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
+            </svg>
+            <span class="font-medium">Nosotros</span>
+          </a>
+          <a href="#" (click)="closeMobileMenu()" class="flex items-center gap-3 px-3 py-3 text-slate-700 hover:bg-slate-100 rounded-lg transition-colors">
+            <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
+            </svg>
+            <span class="font-medium">Contacto</span>
+          </a>
+          <div class="border-t border-slate-200 my-4"></div>
+          <div class="flex flex-col gap-2">
+            <button (click)="toggleMode(); closeMobileMenu()" [class]="!isLoginMode ? 'bg-blue-600 text-white hover:bg-blue-700' : 'bg-slate-200 text-slate-900 hover:bg-slate-300'" class="px-4 py-3 rounded-lg text-sm font-semibold transition-colors">
+              Registrarse
+            </button>
+            <button (click)="toggleMode(); closeMobileMenu()" [class]="isLoginMode ? 'bg-blue-600 text-white hover:bg-blue-700' : 'bg-slate-200 text-slate-900 hover:bg-slate-300'" class="px-4 py-3 rounded-lg text-sm font-semibold transition-colors">
+              Iniciar Sesión
+            </button>
+          </div>
+        </nav>
+      </div>
+    </div>
+    
+    <main class="flex flex-1 items-center justify-center py-8 sm:py-12 px-4 sm:px-6 lg:px-8">
       <div class="w-full max-w-md space-y-8">
         <div class="text-center">
-          <h2 class="text-3xl font-extrabold text-slate-900 tracking-tight">
+          <h2 class="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
             {{ isLoginMode ? 'Iniciar Sesión' : 'Crear Cuenta' }}
           </h2>
-          <p class="mt-2 text-md text-slate-600">
+          <p class="mt-2 text-sm sm:text-md text-slate-600">
             {{ isLoginMode ? 'Accede a tu cuenta para gestionar tus reportes' : 'Regístrate para reportar problemas en tu comunidad' }}
           </p>
         </div>
         
-        <div class="mt-8 space-y-6 rounded-lg bg-white p-8 shadow-lg">
+        <div class="mt-8 space-y-6 rounded-lg bg-white p-4 sm:p-6 lg:p-8 shadow-lg">
           <div *ngIf="error" class="bg-red-50 border border-red-200 rounded-md p-4">
             <div class="flex">
               <svg class="h-5 w-5 text-red-400" fill="currentColor" viewBox="0 0 20 20">
@@ -47,7 +123,7 @@
           </div>
 
           <form (ngSubmit)="onSubmit()" class="space-y-4">
-            <div *ngIf="!isLoginMode" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div *ngIf="!isLoginMode" class="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
                 <label class="sr-only" for="nombre">Nombre(s)</label>
                 <input 

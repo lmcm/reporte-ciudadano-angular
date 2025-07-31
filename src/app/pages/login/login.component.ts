@@ -24,6 +24,7 @@ export class LoginComponent implements OnInit {
   loading = false;
   error = '';
   private redirectPage = '/mis-reportes';
+  showMobileMenu = false;
 
   ngOnInit() {
     // Verificar si ya está logueado y hay página de redirección
@@ -97,5 +98,13 @@ export class LoginComponent implements OnInit {
     this.nombre = '';
     this.apellidos = '';
     this.error = '';
+  }
+
+  toggleMobileMenu() {
+    this.showMobileMenu = !this.showMobileMenu;
+  }
+
+  closeMobileMenu() {
+    this.showMobileMenu = false;
   }
 }

@@ -17,6 +17,7 @@ export class AdminPanelComponent implements OnInit, OnDestroy {
   private reportesService = inject(ReportesService);
   private router = inject(Router);
   
+  showMobileMenu = false;
   reportes: Reporte[] = [];
   loading = true;
   error: string | null = null;
@@ -118,6 +119,14 @@ export class AdminPanelComponent implements OnInit, OnDestroy {
       return `${primerNombre} ${primerApellido}`;
     }
     return palabras[0].charAt(0).toUpperCase() + palabras[0].slice(1).toLowerCase();
+  }
+
+  toggleMobileMenu() {
+    this.showMobileMenu = !this.showMobileMenu;
+  }
+
+  closeMobileMenu() {
+    this.showMobileMenu = false;
   }
 
   verDetalle(reporteId: string) {

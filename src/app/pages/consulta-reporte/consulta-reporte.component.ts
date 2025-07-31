@@ -15,14 +15,16 @@ import { Reporte, EstadoReporte, TipoServicio } from '../../models/reporte.model
 export class ConsultaReporteComponent {
   private reportesService = inject(ReportesService);
   
+  showMobileMenu = false;
   folio = '';
+  telefono = '';
   reporteEncontrado = false;
   folioConsultado = false;
   loading = false;
   reporte: Reporte | null = null;
 
   buscarReporte() {
-    if (!this.folio.trim()) return;
+    if (!this.folio.trim() || !this.telefono.trim()) return;
     
     this.loading = true;
     this.folioConsultado = true;
@@ -30,7 +32,10 @@ export class ConsultaReporteComponent {
     
     this.reportesService.obtenerTodosLosReportes().subscribe({
       next: (reportes) => {
-        const reporteEncontrado = reportes.find(r => r.folio === this.folio.trim());
+        const reporteEncontrado = reportes.find(r => 
+          r.folio === this.folio.trim() && 
+          r.ciudadanoTelefono === this.telefono.trim()
+        );
         if (reporteEncontrado) {
           this.reporte = reporteEncontrado;
           this.reporteEncontrado = true;
@@ -67,6 +72,14 @@ export class ConsultaReporteComponent {
       case TipoServicio.OTRO: return 'Otro';
       default: return 'Desconocido';
     }
+  }
+
+  toggleMobileMenu() {
+    this.showMobileMenu = !this.showMobileMenu;
+  }
+
+  closeMobileMenu() {
+    this.showMobileMenu = false;
   }
 
   formatearFecha(fecha: any): string {
