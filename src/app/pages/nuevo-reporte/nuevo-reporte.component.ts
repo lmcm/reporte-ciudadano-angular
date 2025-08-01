@@ -6,6 +6,7 @@ import { Subject, takeUntil, finalize } from 'rxjs';
 import { ReportesService } from '../../services/reportes.service';
 import { AuthService } from '../../services/auth.service';
 import { LoggerService } from '../../services/logger.service';
+import { TwilioWhatsappService } from '../../services/twilio-whatsapp.service';
 import { ReporteValidators } from '../../validators/reporte.validators';
 import { TipoServicio, PrioridadReporte, EstadoReporte, ReporteCreate } from '../../models/reporte.model';
 import { HeaderComponent } from "src/app/components/header/header.component";
@@ -22,6 +23,7 @@ export class NuevoReporteComponent implements OnInit, OnDestroy {
   private reportesService = inject(ReportesService);
   private authService = inject(AuthService);
   private logger = inject(LoggerService);
+  private twilioWhatsappService = inject(TwilioWhatsappService);
   private router = inject(Router);
   private destroy$ = new Subject<void>();
 
@@ -134,6 +136,17 @@ export class NuevoReporteComponent implements OnInit, OnDestroy {
   private handleSuccess(reporteId: string): void {
     this.successMessage = `Reporte creado exitosamente. ID: ${reporteId}`;
     this.logger.info('Reporte creado exitosamente', { reporteId });
+    
+    // Enviar notificación Twilio WhatsApp
+    const telefono = this.reporteForm.value.ciudadanoTelefono;
+    if (telefono) {
+      this.twilioWhatsappService.sendReportNotification(telefono, reporteId)
+        .subscribe({
+          next: () => this.logger.info('Twilio WhatsApp enviado', { reporteId, telefono }),
+          error: (error) => this.logger.warn('Error al enviar Twilio WhatsApp', { error, reporteId })
+        });
+    }
+    
     this.resetForm();
     setTimeout(() => this.router.navigate(['/mis-reportes']), 2000);
   }

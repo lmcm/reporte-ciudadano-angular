@@ -4,6 +4,7 @@ import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { HeaderComponent } from '../../components/header/header.component';
 import { ReportesService } from '../../services/reportes.service';
+import { TwilioWhatsappService } from '../../services/twilio-whatsapp.service';
 import { TipoServicio, EstadoReporte, PrioridadReporte } from '../../models/reporte.model';
 
 @Component({
@@ -17,6 +18,7 @@ export class NuevoReporteInvitadoComponent implements OnInit {
   private fb = inject(FormBuilder);
   private router = inject(Router);
   private reportesService = inject(ReportesService);
+  private twilioWhatsappService = inject(TwilioWhatsappService);
 
   showMobileMenu = false;
   reporteForm!: FormGroup;
@@ -125,12 +127,19 @@ export class NuevoReporteInvitadoComponent implements OnInit {
       this.reportesService.crearReporte(reporteData).subscribe({
         next: (reporteId) => {
           this.successMessage = 'Reporte enviado exitosamente. ID: ' + reporteId;
+          
+          // Enviar notificación Twilio WhatsApp
+          const telefono = formData.telefono;
+          if (telefono) {
+            this.twilioWhatsappService.sendReportNotification(telefono, reporteId)
+              .subscribe({
+                next: () => console.log('Twilio WhatsApp enviado', { reporteId, telefono }),
+                error: (error) => console.warn('Error al enviar Twilio WhatsApp', { error, reporteId })
+              });
+          }
+          
           this.reporteForm.reset();
           this.isLoading = false;
-          
-          // setTimeout(() => {
-          //   this.router.navigate(['/inicio']);
-          // }, 3000);
         },
         error: (error) => {
           this.errorMessage = 'Error al enviar el reporte: ' + error;
