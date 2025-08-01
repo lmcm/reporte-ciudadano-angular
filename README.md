@@ -114,6 +114,61 @@ src/
 - **TypeScript** para tipado fuerte
 - **Routing** con parámetros dinámicos
 
+## Troubleshooting Firebase
+
+### Error: "Expected first argument to collection() to be a CollectionReference, a DocumentReference or FirebaseFirestore"
+
+**Causa:** Incompatibilidad de versiones entre Angular, Angular Fire y Firebase.
+
+**Solución:**
+
+1. **Verificar versiones compatibles:**
+   - Angular 17 → Angular Fire 17.x → Firebase 10.x
+   - Angular 18 → Angular Fire 18.x → Firebase 11.x
+
+2. **Reinstalar dependencias:**
+   ```bash
+   # Eliminar dependencias conflictivas
+   npm uninstall @angular/fire firebase
+   
+   # Limpiar completamente
+   rm -rf node_modules package-lock.json
+   
+   # Reinstalar con versiones compatibles (Angular 17)
+   npm install
+   npm install @angular/fire@^17.1.0 firebase@^10.12.5 --save
+   ```
+
+3. **Verificar instalación:**
+   ```bash
+   npm list @angular/fire firebase
+   ```
+
+4. **Versiones recomendadas para Angular 17:**
+   ```json
+   {
+     "@angular/fire": "^17.1.0",
+     "firebase": "^10.12.5"
+   }
+   ```
+
+### Configuración Firebase
+
+**Variables de entorno requeridas:**
+- `environment.firebase.apiKey`
+- `environment.firebase.authDomain`
+- `environment.firebase.projectId`
+- `environment.firebase.storageBucket`
+- `environment.firebase.messagingSenderId`
+- `environment.firebase.appId`
+
+**Providers en main.ts:**
+```typescript
+provideFirebaseApp(() => initializeApp(environment.firebase)),
+provideFirestore(() => getFirestore()),
+provideStorage(() => getStorage())
+```
+
 ## Próximas Mejoras
 
 - Integración con backend/API
