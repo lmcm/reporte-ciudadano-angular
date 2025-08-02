@@ -28,6 +28,10 @@ export class LoginComponent implements OnInit {
   error = '';
   private redirectPage = '/nuevo-reporte';
   showMobileMenu = false;
+  showForgotPassword = false;
+  resetEmail = '';
+  resetLoading = false;
+  resetMessage = '';
 
   ngOnInit() {
     // Verificar si ya está logueado y hay página de redirección
@@ -137,5 +141,35 @@ export class LoginComponent implements OnInit {
 
   closeMobileMenu() {
     this.showMobileMenu = false;
+  }
+
+  showForgotPasswordForm() {
+    this.showForgotPassword = true;
+    this.resetEmail = this.email;
+    this.resetMessage = '';
+  }
+
+  hideForgotPasswordForm() {
+    this.showForgotPassword = false;
+    this.resetEmail = '';
+    this.resetMessage = '';
+  }
+
+  sendPasswordReset() {
+    if (!this.resetEmail || this.resetLoading) return;
+    
+    this.resetLoading = true;
+    this.resetMessage = '';
+    
+    this.authService.resetPassword(this.resetEmail).subscribe({
+      next: () => {
+        this.resetMessage = 'Se ha enviado un enlace de recuperación a tu correo electrónico.';
+        this.resetLoading = false;
+      },
+      error: (error) => {
+        this.resetMessage = 'Error al enviar el correo: ' + (error.message || 'Intenta nuevamente');
+        this.resetLoading = false;
+      }
+    });
   }
 }

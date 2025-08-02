@@ -69,4 +69,5 @@ testem.log
 .DS_Store
 Thumbs.db
 .firebase/hosting.d3d3.cache
- 
+# Environment files
+src/environments/environment.ts

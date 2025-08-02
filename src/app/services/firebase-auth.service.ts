@@ -38,6 +38,13 @@ export class FirebaseAuthService {
     return updateProfile(user, profile);
   }
 
+  // Recuperar contraseña
+  resetPassword(email: string): Observable<void> {
+    return from(import('firebase/auth').then(({ sendPasswordResetEmail }) => 
+      sendPasswordResetEmail(this.auth, email)
+    ));
+  }
+
   // Login con Google
   loginWithGoogle(): Observable<any> {
     return from(signInWithPopup(this.auth, this.googleProvider));

@@ -143,6 +143,10 @@ export class AuthService {
     return this.firebaseAuth.logout();
   }
 
+  resetPassword(email: string): Observable<void> {
+    return this.firebaseAuth.resetPassword(email);
+  }
+
   updateUserProfile(profileData: Partial<Usuario>): Observable<Usuario> {
     const currentUser = this.getCurrentUser();
     if (!currentUser) {
