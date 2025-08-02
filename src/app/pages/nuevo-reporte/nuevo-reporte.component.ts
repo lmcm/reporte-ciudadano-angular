@@ -7,6 +7,7 @@ import { ReportesService } from '../../services/reportes.service';
 import { AuthService } from '../../services/auth.service';
 import { LoggerService } from '../../services/logger.service';
 import { TwilioWhatsappService } from '../../services/twilio-whatsapp.service';
+import { FirebaseAuthService } from '../../services/firebase-auth.service';
 import { ReporteValidators } from '../../validators/reporte.validators';
 import { TipoServicio, PrioridadReporte, EstadoReporte, ReporteCreate } from '../../models/reporte.model';
 import { HeaderComponent } from "src/app/components/header/header.component";
@@ -22,6 +23,7 @@ export class NuevoReporteComponent implements OnInit, OnDestroy {
   private fb = inject(FormBuilder);
   private reportesService = inject(ReportesService);
   private authService = inject(AuthService);
+  private firebaseAuth = inject(FirebaseAuthService);
   private logger = inject(LoggerService);
   private twilioWhatsappService = inject(TwilioWhatsappService);
   private router = inject(Router);
@@ -33,6 +35,10 @@ export class NuevoReporteComponent implements OnInit, OnDestroy {
   successMessage = '';
   selectedFile: File | null = null;
   showMobileMenu = false;
+  currentUser: any = null;
+  redirectCountdown = 0;
+  currentReporteId = '';
+  private countdownInterval: any = null;
 
   readonly tiposServicio = [
     { value: TipoServicio.LAMPARA, label: 'Lámpara fundida o averiada' },
@@ -106,16 +112,16 @@ export class NuevoReporteComponent implements OnInit, OnDestroy {
   }
 
   private buildReporteData(): ReporteCreate {
-    const formData = this.reporteForm.value;
+    const formData = this.reporteForm.getRawValue(); // getRawValue incluye campos deshabilitados
     return {
       tipoServicio: formData.tipoServicio,
       direccion: formData.direccion.trim(),
       comentarios: formData.comentarios?.trim() || '',
       ciudadanoId: this.generateTempUserId(),
-      ciudadanoNombre: formData.ciudadanoNombre.trim(),
-      ciudadanoApellidos: formData.ciudadanoApellidos.trim(),
-      ciudadanoEmail: formData.ciudadanoEmail.trim().toLowerCase(),
-      ciudadanoTelefono: formData.ciudadanoTelefono.trim(),
+      ciudadanoNombre: formData.ciudadanoNombre?.trim() || '',
+      ciudadanoApellidos: formData.ciudadanoApellidos?.trim() || '',
+      ciudadanoEmail: formData.ciudadanoEmail?.trim().toLowerCase() || '',
+      ciudadanoTelefono: formData.ciudadanoTelefono?.trim() || '',
       estado: EstadoReporte.PENDIENTE, // Estado inicial para historial
       prioridad: this.calculatePriority(formData.tipoServicio),
       evidenciasFotograficas: this.selectedFile ? [] : undefined
@@ -135,20 +141,66 @@ export class NuevoReporteComponent implements OnInit, OnDestroy {
 
   private handleSuccess(reporteId: string): void {
     this.successMessage = `Reporte creado exitosamente. ID: ${reporteId}`;
+    this.currentReporteId = reporteId;
     this.logger.info('Reporte creado exitosamente', { reporteId });
     
+    // Scroll al mensaje de éxito
+    setTimeout(() => {
+      const successElement = document.querySelector('.success-message');
+      if (successElement) {
+        successElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+    }, 100);
+    
+    // Iniciar contador de redirección con delay
+    setTimeout(() => {
+      this.redirectCountdown = 10;
+      this.countdownInterval = setInterval(() => {
+        this.redirectCountdown--;
+        if (this.redirectCountdown <= 0) {
+          clearInterval(this.countdownInterval);
+          this.router.navigate(['/mis-reportes']);
+        }
+      }, 1000);
+    }, 2000); // Esperar 2 segundos para que el reporte se guarde completamente
+    
     // Enviar notificación Twilio WhatsApp
-    const telefono = this.reporteForm.value.ciudadanoTelefono;
-    if (telefono) {
-      this.twilioWhatsappService.sendReportNotification(telefono, reporteId)
+    const formData = this.reporteForm.getRawValue();
+    const telefono = formData.ciudadanoTelefono;
+    
+    this.logger.info('Intentando enviar WhatsApp', { 
+      reporteId, 
+      telefono, 
+      hasPhone: !!telefono,
+      phoneLength: telefono?.length 
+    });
+    
+    if (telefono && telefono.trim()) {
+      this.twilioWhatsappService.sendReportNotification(telefono.trim(), reporteId)
         .subscribe({
-          next: () => this.logger.info('Twilio WhatsApp enviado', { reporteId, telefono }),
-          error: (error) => this.logger.warn('Error al enviar Twilio WhatsApp', { error, reporteId })
+          next: (response) => {
+            this.logger.info('Twilio WhatsApp enviado exitosamente', { 
+              reporteId, 
+              telefono, 
+              response 
+            });
+          },
+          error: (error) => {
+            this.logger.error('Error al enviar Twilio WhatsApp', { 
+              error: error.message || error, 
+              reporteId, 
+              telefono 
+            });
+          }
         });
+    } else {
+      this.logger.warn('No se pudo enviar WhatsApp: teléfono no disponible', { 
+        reporteId, 
+        formData: formData 
+      });
     }
     
     this.resetForm();
-    setTimeout(() => this.router.navigate(['/mis-reportes']), 2000);
   }
 
   private handleError(error: string): void {
@@ -184,20 +236,51 @@ export class NuevoReporteComponent implements OnInit, OnDestroy {
   }
 
   private loadUserData(): void {
-    const currentUser = this.authService.getCurrentUser();
-    if (currentUser) {
-      this.reporteForm.patchValue({
-        ciudadanoNombre: currentUser.nombre,
-        ciudadanoApellidos: currentUser.apellidos,
-        ciudadanoEmail: currentUser.email
-      });
-      this.logger.info('Datos de usuario cargados', { userId: currentUser.id });
-    }
+    // Suscribirse a cambios del usuario autenticado
+    this.authService.currentUser$.pipe(
+      takeUntil(this.destroy$)
+    ).subscribe(currentUser => {
+      this.currentUser = currentUser;
+      if (currentUser && this.authService.isAuthenticated()) {
+        // Precargar información del usuario logueado
+        this.reporteForm.patchValue({
+          ciudadanoNombre: currentUser.nombre || '',
+          ciudadanoApellidos: currentUser.apellidos || '',
+          ciudadanoEmail: currentUser.email || '',
+          ciudadanoTelefono: currentUser.telefono || ''
+        });
+        
+        // Deshabilitar campos precargados para evitar modificaciones accidentales
+        // Teléfono permanece editable
+        this.reporteForm.get('ciudadanoNombre')?.disable();
+        this.reporteForm.get('ciudadanoApellidos')?.disable();
+        this.reporteForm.get('ciudadanoEmail')?.disable();
+        this.reporteForm.get('ciudadanoTelefono')?.enable();
+        
+        this.logger.info('Datos de usuario precargados automáticamente', { 
+          userId: currentUser.id,
+          nombre: currentUser.nombre,
+          apellidos: currentUser.apellidos,
+          email: currentUser.email
+        });
+      } else {
+        // Si no hay usuario logueado, habilitar todos los campos
+        this.reporteForm.get('ciudadanoNombre')?.enable();
+        this.reporteForm.get('ciudadanoApellidos')?.enable();
+        this.reporteForm.get('ciudadanoEmail')?.enable();
+        this.reporteForm.get('ciudadanoTelefono')?.enable();
+      }
+    });
   }
 
   private generateTempUserId(): string {
     const currentUser = this.authService.getCurrentUser();
-    return currentUser ? currentUser.id : `temp_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+    if (currentUser) {
+      return currentUser.id;
+    }
+    // Si no hay usuario autenticado, usar Firebase Auth directamente
+    const firebaseUser = this.firebaseAuth.getCurrentUser();
+    return firebaseUser ? firebaseUser.uid : `temp_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
   }
 
   getErrorMessage(fieldName: string): string {
@@ -219,5 +302,31 @@ export class NuevoReporteComponent implements OnInit, OnDestroy {
 
   closeMobileMenu() {
     this.showMobileMenu = false;
+  }
+
+  logout() {
+    this.authService.logout().subscribe({
+      next: () => {
+        this.router.navigate(['/inicio']);
+      },
+      error: (error) => {
+        console.error('Error al cerrar sesión:', error);
+      }
+    });
+  }
+
+  verDetalleReporte() {
+    if (this.currentReporteId) {
+      // Cancelar el contador de redirección
+      if (this.countdownInterval) {
+        clearInterval(this.countdownInterval);
+        this.redirectCountdown = 0;
+      }
+      
+      // Esperar un momento para asegurar que el reporte esté guardado
+      setTimeout(() => {
+        this.router.navigate(['/reporte-detalle', this.currentReporteId]);
+      }, 1000);
+    }
   }
 }

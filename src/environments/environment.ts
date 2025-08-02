@@ -15,7 +15,7 @@ export const environment = {
   },
   twilio: {
     accountSid: 'AC0315c142f0a1dec54f342b34a11f38a1',
-    authToken: '3d308893a73f31dc1de6257654c4832a',
+    authToken: '0db713e3fe87c761a5a4e849ee3b56b6',
     whatsappFrom: 'whatsapp:+14155238886',
     apiUrl: 'https://api.twilio.com/2010-04-01/Accounts'
   }

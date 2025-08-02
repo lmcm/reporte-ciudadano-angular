@@ -128,6 +128,14 @@ export class NuevoReporteInvitadoComponent implements OnInit {
         next: (reporteId) => {
           this.successMessage = 'Reporte enviado exitosamente. ID: ' + reporteId;
           
+          // Scroll al mensaje de éxito
+          setTimeout(() => {
+            const successElement = document.querySelector('.success-message');
+            if (successElement) {
+              successElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+          }, 100);
+          
           // Enviar notificación Twilio WhatsApp
           const telefono = formData.telefono;
           if (telefono) {

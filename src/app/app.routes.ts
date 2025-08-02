@@ -1,5 +1,5 @@
 import { Routes } from '@angular/router';
-import { authGuard } from './guards/auth.guard';
+import { authGuard, guestGuard } from './guards/auth.guard';
 
 export const routes: Routes = [
   { path: '', redirectTo: '/inicio', pathMatch: 'full' },
@@ -9,7 +9,8 @@ export const routes: Routes = [
   },
   { 
     path: 'login', 
-    loadComponent: () => import('./pages/login/login.component').then(m => m.LoginComponent) 
+    loadComponent: () => import('./pages/login/login.component').then(m => m.LoginComponent),
+    canActivate: [guestGuard]
   },
   { 
     path: 'nuevo-reporte', 

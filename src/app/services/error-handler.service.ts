@@ -44,8 +44,13 @@ export class ErrorHandlerService {
   private determineSeverity(error: any): AppError['severity'] {
     if (error?.status >= 500) return 'critical';
     if (error?.status >= 400) return 'high';
-    if (error?.code?.includes('permission')) return 'high';
-    if (error?.code?.includes('network')) return 'medium';
+    
+    const code = error?.code;
+    if (typeof code === 'string') {
+      if (code.includes('permission')) return 'high';
+      if (code.includes('network')) return 'medium';
+    }
+    
     return 'low';
   }
 

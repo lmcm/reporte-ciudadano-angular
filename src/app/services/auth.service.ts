@@ -1,6 +1,9 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { BehaviorSubject, Observable, of, throwError } from 'rxjs';
-import { delay } from 'rxjs/operators';
+import { delay, map, switchMap } from 'rxjs/operators';
+import { FirebaseAuthService } from './firebase-auth.service';
+import { UserProfileService, UserProfile } from './user-profile.service';
+import { User } from 'firebase/auth';
 
 export interface Usuario {
   id: string;
@@ -28,13 +31,46 @@ export interface RegisterData {
   providedIn: 'root'
 })
 export class AuthService {
+  private firebaseAuth = inject(FirebaseAuthService);
+  private userProfileService = inject(UserProfileService);
   private currentUserSubject = new BehaviorSubject<Usuario | null>(null);
   public currentUser$ = this.currentUserSubject.asObservable();
-  private users: Usuario[] = [];
 
   constructor() {
-    this.loadUsersFromStorage();
-    this.checkActiveSession();
+    this.initializeAuthState();
+  }
+
+  private initializeAuthState(): void {
+    this.firebaseAuth.user$.subscribe(firebaseUser => {
+      if (firebaseUser) {
+        // Cargar datos completos desde Firestore
+        this.userProfileService.getUserProfile(firebaseUser.uid).subscribe(profile => {
+          if (profile) {
+            const usuario: Usuario = {
+              id: profile.uid,
+              nombre: profile.nombre,
+              apellidos: profile.apellidos,
+              email: profile.email,
+              telefono: profile.telefono,
+              fechaRegistro: profile.fechaRegistro
+            };
+            this.setCurrentUser(usuario);
+          } else {
+            // Fallback si no hay perfil en Firestore
+            const usuario: Usuario = {
+              id: firebaseUser.uid,
+              nombre: firebaseUser.displayName?.split(' ')[0] || 'Usuario',
+              apellidos: firebaseUser.displayName?.split(' ').slice(1).join(' ') || '',
+              email: firebaseUser.email || '',
+              fechaRegistro: new Date(firebaseUser.metadata.creationTime || Date.now())
+            };
+            this.setCurrentUser(usuario);
+          }
+        });
+      } else {
+        this.setCurrentUser(null);
+      }
+    });
   }
 
   getCurrentUser(): Usuario | null {
@@ -60,46 +96,51 @@ export class AuthService {
   }
 
   register(data: RegisterData): Observable<Usuario> {
-    if (this.users.find(u => u.email === data.email)) {
-      return throwError(() => new Error('El email ya está registrado'));
-    }
-
-    const newUser: Usuario = {
-      id: this.generateId(),
-      nombre: data.nombre,
-      apellidos: data.apellidos,
-      email: data.email,
-      fechaRegistro: new Date()
-    };
-
-    this.users.push(newUser);
-    this.saveUsersToStorage();
-    this.setCurrentUser(newUser);
-    this.saveActiveSession(newUser);
-
-    return of(newUser).pipe(delay(500));
+    const displayName = `${data.nombre} ${data.apellidos}`;
+    return this.firebaseAuth.registerWithEmail(data.email, data.password, displayName).pipe(
+      switchMap(result => {
+        const userProfile: UserProfile = {
+          uid: result.user.uid,
+          nombre: data.nombre,
+          apellidos: data.apellidos,
+          email: data.email,
+          fechaRegistro: new Date()
+        };
+        
+        // Guardar perfil completo en Firestore
+        return this.userProfileService.saveUserProfile(userProfile).pipe(
+          map(() => {
+            const usuario: Usuario = {
+              id: result.user.uid,
+              nombre: data.nombre,
+              apellidos: data.apellidos,
+              email: data.email,
+              fechaRegistro: new Date()
+            };
+            return usuario;
+          })
+        );
+      })
+    );
   }
 
   login(credentials: LoginCredentials): Observable<Usuario> {
-    const user = this.users.find(u => u.email === credentials.email);
-    
-    if (!user) {
-      return throwError(() => new Error('Usuario no encontrado'));
-    }
-
-    if (credentials.password.length < 6) {
-      return throwError(() => new Error('Contraseña incorrecta'));
-    }
-
-    this.setCurrentUser(user);
-    this.saveActiveSession(user);
-
-    return of(user).pipe(delay(500));
+    return this.firebaseAuth.loginWithEmail(credentials.email, credentials.password).pipe(
+      map(result => {
+        const usuario: Usuario = {
+          id: result.user.uid,
+          nombre: result.user.displayName?.split(' ')[0] || 'Usuario',
+          apellidos: result.user.displayName?.split(' ').slice(1).join(' ') || '',
+          email: result.user.email || '',
+          fechaRegistro: new Date(result.user.metadata.creationTime || Date.now())
+        };
+        return usuario;
+      })
+    );
   }
 
-  logout(): void {
-    this.setCurrentUser(null);
-    localStorage.removeItem('activeUser');
+  logout(): Observable<void> {
+    return this.firebaseAuth.logout();
   }
 
   updateUserProfile(profileData: Partial<Usuario>): Observable<Usuario> {
@@ -108,51 +149,29 @@ export class AuthService {
       return throwError(() => new Error('Usuario no autenticado'));
     }
 
-    // Actualizar el usuario en el array de usuarios
-    const userIndex = this.users.findIndex(u => u.id === currentUser.id);
-    if (userIndex === -1) {
-      return throwError(() => new Error('Usuario no encontrado'));
-    }
-
-    const updatedUser: Usuario = {
-      ...currentUser,
-      ...profileData,
-      id: currentUser.id, // Mantener el ID original
-      fechaRegistro: currentUser.fechaRegistro // Mantener la fecha de registro original
+    const updatedProfile: UserProfile = {
+      uid: currentUser.id,
+      nombre: profileData.nombre || currentUser.nombre,
+      apellidos: profileData.apellidos || currentUser.apellidos,
+      email: profileData.email || currentUser.email,
+      telefono: profileData.telefono || currentUser.telefono,
+      fechaRegistro: currentUser.fechaRegistro
     };
 
-    this.users[userIndex] = updatedUser;
-    this.saveUsersToStorage();
-    this.setCurrentUser(updatedUser);
-    this.saveActiveSession(updatedUser);
-
-    return of(updatedUser).pipe(delay(500));
+    // Actualizar perfil en Firestore
+    return this.userProfileService.saveUserProfile(updatedProfile).pipe(
+      map(() => {
+        const updatedUser: Usuario = {
+          ...currentUser,
+          ...profileData,
+          id: currentUser.id,
+          fechaRegistro: currentUser.fechaRegistro
+        };
+        this.setCurrentUser(updatedUser);
+        return updatedUser;
+      })
+    );
   }
 
-  private generateId(): string {
-    return 'user_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
-  }
 
-  private loadUsersFromStorage(): void {
-    const stored = localStorage.getItem('registeredUsers');
-    if (stored) {
-      this.users = JSON.parse(stored);
-    }
-  }
-
-  private saveUsersToStorage(): void {
-    localStorage.setItem('registeredUsers', JSON.stringify(this.users));
-  }
-
-  private saveActiveSession(user: Usuario): void {
-    localStorage.setItem('activeUser', JSON.stringify(user));
-  }
-
-  private checkActiveSession(): void {
-    const stored = localStorage.getItem('activeUser');
-    if (stored) {
-      const user = JSON.parse(stored);
-      this.setCurrentUser(user);
-    }
-  }
 }

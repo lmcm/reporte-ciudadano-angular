@@ -16,11 +16,25 @@
           <nav class="flex items-center gap-8">
             <a routerLink="/inicio" routerLinkActive="text-blue-600" class="text-slate-600 text-base font-medium leading-normal hover:text-blue-600 transition-colors">Inicio</a>
             <a routerLink="/servicios" routerLinkActive="text-blue-600" class="text-slate-600 text-base font-medium leading-normal hover:text-blue-600 transition-colors">Servicios</a>
+            <a *ngIf="isAuthenticated" routerLink="/mis-reportes" routerLinkActive="text-blue-600" class="text-slate-600 text-base font-medium leading-normal hover:text-blue-600 transition-colors">Mis Reportes</a>
             <a href="#" class="text-slate-600 text-base font-medium leading-normal hover:text-blue-600 transition-colors">Nosotros</a>
             <a href="#" class="text-slate-600 text-base font-medium leading-normal hover:text-blue-600 transition-colors">Contacto</a>
           </nav>
           <div class="flex items-center gap-4">
-            <a routerLink="/login" class="inline-flex h-10 items-center justify-center rounded-md bg-blue-600 px-6 text-sm font-medium text-white shadow transition-colors hover:bg-blue-700">
+            <!-- Usuario logueado -->
+            <div *ngIf="isAuthenticated" class="relative">
+              <button (click)="logout()" class="flex items-center gap-2 px-4 py-2 text-sm font-medium text-slate-700 hover:text-blue-600 transition-colors">
+                <div class="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center text-white text-sm font-semibold">
+                  {{ currentUser?.nombre?.charAt(0) || 'U' }}
+                </div>
+                <span>{{ currentUser?.nombre || 'Usuario' }}</span>
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
+                </svg>
+              </button>
+            </div>
+            <!-- Usuario no logueado -->
+            <a *ngIf="!isAuthenticated" routerLink="/login" class="inline-flex h-10 items-center justify-center rounded-md bg-blue-600 px-6 text-sm font-medium text-white shadow transition-colors hover:bg-blue-700">
               Iniciar Sesión
             </a>
           </div>
@@ -70,6 +84,12 @@
           </svg>
           <span class="font-medium">Servicios</span>
         </a>
+        <a *ngIf="isAuthenticated" routerLink="/mis-reportes" (click)="closeMobileMenu()" class="flex items-center gap-3 px-3 py-3 text-slate-700 hover:bg-slate-100 rounded-lg transition-colors">
+          <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+          </svg>
+          <span class="font-medium">Mis Reportes</span>
+        </a>
         <a href="#" (click)="closeMobileMenu()" class="flex items-center gap-3 px-3 py-3 text-slate-700 hover:bg-slate-100 rounded-lg transition-colors">
           <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
@@ -83,7 +103,26 @@
           <span class="font-medium">Contacto</span>
         </a>
         <div class="border-t border-slate-200 my-4"></div>
-        <a routerLink="/login" (click)="closeMobileMenu()" class="flex items-center justify-center gap-2 px-4 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+        <!-- Usuario logueado -->
+        <div *ngIf="isAuthenticated" class="space-y-2">
+          <div class="flex items-center gap-3 px-4 py-3 bg-slate-50 rounded-lg">
+            <div class="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center text-white font-semibold">
+              {{ currentUser?.nombre?.charAt(0) || 'U' }}
+            </div>
+            <div>
+              <p class="font-medium text-slate-900">{{ currentUser?.nombre || 'Usuario' }}</p>
+              <p class="text-sm text-slate-500">{{ currentUser?.email }}</p>
+            </div>
+          </div>
+          <button (click)="logout(); closeMobileMenu()" class="flex items-center justify-center gap-2 w-full px-4 py-3 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors">
+            <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
+            </svg>
+            <span class="font-medium">Cerrar Sesión</span>
+          </button>
+        </div>
+        <!-- Usuario no logueado -->
+        <a *ngIf="!isAuthenticated" routerLink="/login" (click)="closeMobileMenu()" class="flex items-center justify-center gap-2 px-4 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
           <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
           </svg>
@@ -107,9 +146,9 @@
                   Reporta problemas, sigue tus solicitudes y mantente informado sobre los servicios municipales en Boca del Río, Veracruz.
                 </p>
               </div>
-              <a routerLink="/login" [queryParams]="{page: 'nuevo-reporte'}" class="inline-flex h-12 items-center justify-center rounded-md bg-blue-600 px-6 sm:px-8 text-sm font-bold text-white shadow-lg transition-transform duration-200 ease-in-out hover:scale-105 hover:bg-blue-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 w-fit mx-auto lg:mx-0">
+              <button (click)="comenzarNuevoReporte()" class="inline-flex h-12 items-center justify-center rounded-md bg-blue-600 px-6 sm:px-8 text-sm font-bold text-white shadow-lg transition-transform duration-200 ease-in-out hover:scale-105 hover:bg-blue-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 w-fit mx-auto lg:mx-0">
                 Comenzar
-              </a>
+              </button>
             </div>
             <img alt="Imagen Hero" class="mx-auto aspect-video overflow-hidden rounded-xl object-cover sm:w-full lg:order-last" height="550" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAejLMX0gVqX8wweEGyk32FELaSEoRyiZL2idT75Os0laiVrIjxvIAMc1W0IYiEV5K9JW3WFlWKB7SVfh3qTXSdRYJBx-bpEFxkwwYVHiEqDvV7iPAInSR681NU5GvA1JQZel-W7MlPta9oYeRe2F1AZ_a8v7cM7nAbrWYxB53vT-sUsOKLiWJioVKuySBvWfseesjon0oy8wXIaA6XXNYn0JjxVF5iJmYPWY-ZLRJJZGHw6FtGBa2be8zPJcs8gfcneONxBvkwudD_" width="550" />
           </div>

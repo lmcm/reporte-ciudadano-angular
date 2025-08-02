@@ -144,21 +144,34 @@ export class MisReportesComponent implements OnInit, OnDestroy {
   formatearFecha(fecha: any): string {
     if (!fecha) return 'Sin fecha';
     
-    let date: Date;
-    if (fecha.toDate) {
-      // Timestamp de Firebase
-      date = fecha.toDate();
-    } else if (fecha instanceof Date) {
-      date = fecha;
-    } else {
-      date = new Date(fecha);
+    try {
+      let date: Date;
+      
+      if (fecha.toDate && typeof fecha.toDate === 'function') {
+        // Timestamp de Firebase
+        date = fecha.toDate();
+      } else if (fecha instanceof Date) {
+        date = fecha;
+      } else if (typeof fecha === 'string' || typeof fecha === 'number') {
+        date = new Date(fecha);
+      } else {
+        return 'Fecha inválida';
+      }
+      
+      // Verificar si la fecha es válida
+      if (isNaN(date.getTime())) {
+        return 'Fecha inválida';
+      }
+      
+      return date.toLocaleDateString('es-MX', {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric'
+      });
+    } catch (error) {
+      console.warn('Error al formatear fecha:', error, fecha);
+      return 'Fecha inválida';
     }
-    
-    return date.toLocaleDateString('es-MX', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric'
-    });
   }
 
   recargarReportes() {
@@ -166,8 +179,16 @@ export class MisReportesComponent implements OnInit, OnDestroy {
   }
 
   logout() {
-    this.authService.logout();
-    this.router.navigate(['/login']);
+    this.authService.logout().subscribe({
+      next: () => {
+        this.router.navigate(['/login']);
+      },
+      error: (error) => {
+        console.error('Error al cerrar sesión:', error);
+        // Redirigir de todas formas
+        this.router.navigate(['/login']);
+      }
+    });
   }
 
   private escucharCambiosEnTiempoReal() {

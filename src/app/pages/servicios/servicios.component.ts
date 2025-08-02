@@ -1,8 +1,9 @@
-import { Component } from '@angular/core';
-import { RouterLink } from '@angular/router';
+import { Component, inject, OnInit } from '@angular/core';
+import { RouterLink, Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { HeaderComponent } from '../../components/header/header.component';
 import { FooterComponent } from '../../components/footer/footer.component';
+import { AuthService } from '../../services/auth.service';
 
 @Component({
   selector: 'app-servicios',
@@ -12,8 +13,20 @@ import { FooterComponent } from '../../components/footer/footer.component';
 
   styles: []
 })
-export class ServiciosComponent {
+export class ServiciosComponent implements OnInit {
+  private authService = inject(AuthService);
+  private router = inject(Router);
+  
   showMobileMenu = false;
+  isAuthenticated = false;
+  currentUser: any = null;
+
+  ngOnInit() {
+    this.authService.currentUser$.subscribe(user => {
+      this.isAuthenticated = !!user;
+      this.currentUser = user;
+    });
+  }
   
   servicios = [
     {
@@ -45,5 +58,16 @@ export class ServiciosComponent {
 
   closeMobileMenu() {
     this.showMobileMenu = false;
+  }
+
+  logout() {
+    this.authService.logout().subscribe({
+      next: () => {
+        this.router.navigate(['/inicio']);
+      },
+      error: (error) => {
+        console.error('Error al cerrar sesión:', error);
+      }
+    });
   }
 }

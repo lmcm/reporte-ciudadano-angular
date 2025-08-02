@@ -57,6 +57,11 @@ export class ReporteDetalleComponent implements OnInit, OnDestroy {
     this.loading = true;
     this.error = null;
     
+    // Intentar cargar el reporte con retry para reportes recién creados
+    this.cargarReporteConRetry(0);
+  }
+  
+  private cargarReporteConRetry(intento: number) {
     this.reportesService.obtenerReporte(this.reporteId)
       .pipe(takeUntil(this.destroy$))
       .subscribe({
@@ -64,14 +69,26 @@ export class ReporteDetalleComponent implements OnInit, OnDestroy {
           if (reporte) {
             this.reporte = reporte;
             this.areaAsignada = reporte.personalAsignado || '';
+            this.loading = false;
+          } else if (intento < 3) {
+            // Reintentar hasta 3 veces con delay creciente
+            setTimeout(() => {
+              this.cargarReporteConRetry(intento + 1);
+            }, (intento + 1) * 1000);
           } else {
             this.error = 'Reporte no encontrado';
+            this.loading = false;
           }
-          this.loading = false;
         },
         error: (error) => {
-          this.error = 'Error al cargar el reporte: ' + error;
-          this.loading = false;
+          if (intento < 3) {
+            setTimeout(() => {
+              this.cargarReporteConRetry(intento + 1);
+            }, (intento + 1) * 1000);
+          } else {
+            this.error = 'Error al cargar el reporte: ' + error;
+            this.loading = false;
+          }
         }
       });
   }

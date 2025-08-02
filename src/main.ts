@@ -7,6 +7,7 @@ import { provideHttpClient, withInterceptors } from '@angular/common/http';
 import { provideFirebaseApp, initializeApp } from '@angular/fire/app';
 import { provideFirestore, getFirestore } from '@angular/fire/firestore';
 import { provideStorage, getStorage } from '@angular/fire/storage';
+import { provideAuth, getAuth } from '@angular/fire/auth';
 import { routes } from './app/app.routes';
 import { environment } from './environments/environment';
 import { errorInterceptor } from './app/interceptors/error.interceptor';
@@ -20,6 +21,7 @@ bootstrapApplication(AppComponent, {
     provideFirebaseApp(() => initializeApp(environment.firebase)),
     provideFirestore(() => getFirestore()),
     provideStorage(() => getStorage()),
+    provideAuth(() => getAuth()),
     { provide: ErrorHandler, useClass: GlobalErrorHandler }
   ]
 }).catch(err => console.error('Error al inicializar la aplicación:', err));
