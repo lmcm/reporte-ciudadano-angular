@@ -92,6 +92,18 @@ export class NuevoReporteComponent implements OnInit, OnDestroy {
       return;
     }
 
+    // Validar imagen requerida
+    if (!this.selectedFile) {
+      this.errorMessage = 'Es obligatorio agregar una evidencia fotográfica del problema reportado.';
+      setTimeout(() => {
+        const errorElement = document.querySelector('.error-message');
+        if (errorElement) {
+          errorElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+      }, 100);
+      return;
+    }
+
     if (this.isLoading) return;
 
     this.isLoading = true;
@@ -204,8 +216,16 @@ export class NuevoReporteComponent implements OnInit, OnDestroy {
   }
 
   private handleError(error: string): void {
-    this.errorMessage = error;
+    this.errorMessage = this.getDescriptiveErrorMessage(error);
     this.logger.error('Error al crear reporte', { error });
+    
+    // Scroll al mensaje de error
+    setTimeout(() => {
+      const errorElement = document.querySelector('.error-message');
+      if (errorElement) {
+        errorElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+    }, 100);
   }
 
   private resetForm(): void {
@@ -328,5 +348,71 @@ export class NuevoReporteComponent implements OnInit, OnDestroy {
         this.router.navigate(['/reporte-detalle', this.currentReporteId]);
       }, 1000);
     }
+  }
+
+  private getDescriptiveErrorMessage(error: string): string {
+    // Log del error original para debug
+    console.error('Error original:', error);
+    
+    // Verificar si faltan campos requeridos
+    const formData = this.reporteForm.getRawValue();
+    const missingFields = [];
+    const invalidFields = [];
+    
+    if (!formData.tipoServicio) missingFields.push('Tipo de servicio');
+    if (!formData.direccion?.trim()) missingFields.push('Dirección');
+    if (!formData.comentarios?.trim()) missingFields.push('Comentarios');
+    if (!formData.ciudadanoNombre?.trim()) missingFields.push('Nombre');
+    if (!formData.ciudadanoApellidos?.trim()) missingFields.push('Apellidos');
+    if (!formData.ciudadanoEmail?.trim()) missingFields.push('Correo electrónico');
+    if (!formData.ciudadanoTelefono?.trim()) missingFields.push('Teléfono');
+    if (!this.selectedFile) missingFields.push('Evidencia fotográfica');
+    
+    // Validar formato de campos
+    if (formData.ciudadanoEmail && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.ciudadanoEmail)) {
+      invalidFields.push('Correo electrónico (formato inválido)');
+    }
+    if (formData.ciudadanoTelefono && !/^[0-9]{10}$/.test(formData.ciudadanoTelefono)) {
+      invalidFields.push('Teléfono (debe tener 10 dígitos)');
+    }
+    
+    if (missingFields.length > 0) {
+      return `Faltan campos obligatorios: ${missingFields.join(', ')}.`;
+    }
+    
+    if (invalidFields.length > 0) {
+      return `Campos con formato incorrecto: ${invalidFields.join(', ')}.`;
+    }
+    
+    // Verificar errores específicos de Firebase/Backend
+    const errorLower = error.toLowerCase();
+    
+    if (errorLower.includes('permission') || errorLower.includes('unauthorized')) {
+      return 'Sin permisos para crear reportes. Inicia sesión nuevamente.';
+    }
+    
+    if (errorLower.includes('network') || errorLower.includes('connection') || errorLower.includes('fetch')) {
+      return 'Error de conexión. Verifica tu internet e intenta nuevamente.';
+    }
+    
+    if (errorLower.includes('storage') || errorLower.includes('upload') || errorLower.includes('file')) {
+      return 'Error al procesar la imagen. Verifica que sea PNG/JPG y menor a 10MB.';
+    }
+    
+    if (errorLower.includes('validation') || errorLower.includes('invalid') || errorLower.includes('required')) {
+      return 'Datos inválidos. Revisa todos los campos y corrige los errores.';
+    }
+    
+    if (errorLower.includes('firestore') || errorLower.includes('database')) {
+      return 'Error en la base de datos. Intenta nuevamente en unos momentos.';
+    }
+    
+    // Mostrar error original si es descriptivo
+    if (error.length > 10 && error.length < 200 && !error.includes('Error:')) {
+      return `Error: ${error}`;
+    }
+    
+    // Mensaje genérico con sugerencias específicas
+    return `No se pudo crear el reporte. Posibles causas:\n• Verifica tu conexión a internet\n• Asegúrate de que todos los campos estén completos\n• Si agregaste una imagen, verifica que sea válida\n• Intenta nuevamente en unos momentos`;
   }
 }

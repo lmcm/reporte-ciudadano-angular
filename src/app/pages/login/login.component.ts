@@ -79,7 +79,7 @@ export class LoginComponent implements OnInit {
         }, 100);
       },
       error: (error) => {
-        this.error = error.message || 'Error al iniciar sesión';
+        this.error = this.getFirebaseErrorMessage(error);
         console.error('Error en login:', error);
       }
     });
@@ -103,7 +103,7 @@ export class LoginComponent implements OnInit {
         }, 100);
       },
       error: (error) => {
-        this.error = error.message || 'Error al registrar usuario';
+        this.error = this.getFirebaseErrorMessage(error);
         console.error('Error en registro:', error);
       }
     });
@@ -121,7 +121,7 @@ export class LoginComponent implements OnInit {
         this.router.navigate([this.redirectPage]);
       },
       error: (error) => {
-        this.error = 'Error al iniciar sesión con Google: ' + error.message;
+        this.error = this.getFirebaseErrorMessage(error);
         this.loading = false;
       }
     });
@@ -141,6 +141,56 @@ export class LoginComponent implements OnInit {
 
   closeMobileMenu() {
     this.showMobileMenu = false;
+  }
+
+  private getFirebaseErrorMessage(error: any): string {
+    const errorCode = error?.code || error?.message || '';
+    
+    switch (errorCode) {
+      case 'auth/invalid-credential':
+      case 'auth/wrong-password':
+      case 'auth/user-not-found':
+        return 'Correo electrónico o contraseña incorrectos. Verifica tus datos e intenta nuevamente.';
+      
+      case 'auth/invalid-email':
+        return 'El formato del correo electrónico no es válido.';
+      
+      case 'auth/user-disabled':
+        return 'Esta cuenta ha sido deshabilitada. Contacta al administrador.';
+      
+      case 'auth/too-many-requests':
+        return 'Demasiados intentos fallidos. Intenta nuevamente en unos minutos.';
+      
+      case 'auth/email-already-in-use':
+        return 'Ya existe una cuenta con este correo electrónico. Intenta iniciar sesión.';
+      
+      case 'auth/weak-password':
+        return 'La contraseña es muy débil. Debe tener al menos 6 caracteres.';
+      
+      case 'auth/network-request-failed':
+        return 'Error de conexión. Verifica tu internet e intenta nuevamente.';
+      
+      default:
+        return 'Ocurrió un error inesperado. Intenta nuevamente.';
+    }
+  }
+
+  private getResetPasswordErrorMessage(error: any): string {
+    const errorCode = error?.code || error?.message || '';
+    
+    switch (errorCode) {
+      case 'auth/user-not-found':
+        return 'No existe una cuenta con este correo electrónico.';
+      
+      case 'auth/invalid-email':
+        return 'El formato del correo electrónico no es válido.';
+      
+      case 'auth/too-many-requests':
+        return 'Demasiadas solicitudes. Intenta nuevamente en unos minutos.';
+      
+      default:
+        return 'Error al enviar el correo. Verifica tu email e intenta nuevamente.';
+    }
   }
 
   showForgotPasswordForm() {
@@ -167,7 +217,7 @@ export class LoginComponent implements OnInit {
         this.resetLoading = false;
       },
       error: (error) => {
-        this.resetMessage = 'Error al enviar el correo: ' + (error.message || 'Intenta nuevamente');
+        this.resetMessage = this.getResetPasswordErrorMessage(error);
         this.resetLoading = false;
       }
     });
