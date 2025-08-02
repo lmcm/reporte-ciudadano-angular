@@ -45,6 +45,11 @@ export class FirebaseAuthService {
     ));
   }
 
+  // Obtener instancia de Auth para operaciones avanzadas
+  getAuth() {
+    return this.auth;
+  }
+
   // Login con Google
   loginWithGoogle(): Observable<any> {
     return from(signInWithPopup(this.auth, this.googleProvider));

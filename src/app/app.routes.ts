@@ -45,5 +45,9 @@ export const routes: Routes = [
     path: 'nuevo-reporte-invitado', 
     loadComponent: () => import('./pages/nuevo-reporte-invitado/nuevo-reporte-invitado.component').then(m => m.NuevoReporteInvitadoComponent)
   },
+  { 
+    path: 'reset-password', 
+    loadComponent: () => import('./pages/reset-password/reset-password.component').then(m => m.ResetPasswordComponent)
+  },
   { path: '**', redirectTo: '/inicio' }
 ];
