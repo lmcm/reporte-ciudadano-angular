@@ -98,6 +98,7 @@
       <div class="mb-6 sm:mb-8 text-center">
         <h2 class="text-2xl sm:text-3xl font-bold text-slate-900">Crear Reporte Anónimo</h2>
         <p class="text-slate-600 mt-2 text-sm sm:text-base">Reporta un problema sin necesidad de registrarte.</p>
+        <p class="text-slate-500 mt-2 text-xs sm:text-sm">Los campos marcados con <span class="text-red-500">*</span> son obligatorios</p>
       </div>
       
       <!-- Mensajes de estado -->
@@ -111,7 +112,7 @@
       <form [formGroup]="reporteForm" (ngSubmit)="onSubmit()" class="space-y-4 sm:space-y-6">
         <!-- Tipo de Servicio -->
         <div>
-          <label class="block text-sm font-medium text-slate-900 mb-1" for="service-type">Tipo de Servicio *</label>
+          <label class="block text-sm font-medium text-slate-900 mb-1" for="service-type">Tipo de Servicio <span class="text-red-500">*</span></label>
           <select 
             formControlName="tipoServicio"
             class="w-full h-10 sm:h-12 px-3 sm:px-4 text-sm sm:text-base rounded-md border border-slate-300 bg-white focus:ring-2 focus:ring-blue-600 focus:border-blue-600 transition"
@@ -125,7 +126,7 @@
         
         <!-- Teléfono Celular -->
         <div>
-          <label class="block text-sm font-medium text-slate-900 mb-1" for="telefono">Teléfono Celular *</label>
+          <label class="block text-sm font-medium text-slate-900 mb-1" for="telefono">Teléfono Celular <span class="text-red-500">*</span></label>
           <input 
             formControlName="telefono"
             class="w-full h-10 sm:h-12 px-3 sm:px-4 text-sm sm:text-base rounded-md border border-slate-300 focus:ring-2 focus:ring-blue-600 focus:border-blue-600 transition"
@@ -139,7 +140,7 @@
         
         <!-- Dirección -->
         <div>
-          <label class="block text-sm font-medium text-slate-900 mb-1" for="direccion">Dirección *</label>
+          <label class="block text-sm font-medium text-slate-900 mb-1" for="direccion">Dirección problema o avería  <span class="text-red-500">*</span></label>
           <input 
             formControlName="direccion"
             class="w-full h-10 sm:h-12 px-3 sm:px-4 text-sm sm:text-base rounded-md border border-slate-300 focus:ring-2 focus:ring-blue-600 focus:border-blue-600 transition"
@@ -150,9 +151,19 @@
           <p *ngIf="hasError('direccion')" class="text-red-500 text-xs mt-1">{{ getErrorMessage('direccion') }}</p>
         </div>
         
+        <!-- Ubicación en el Mapa (Opcional) -->
+        <div>
+          <label class="block text-sm font-medium text-slate-900 mb-1">Ubicación en el Mapa (Opcional)</label>
+          <div id="guestMap" class="w-full h-64 rounded-md border border-slate-300 mb-2"></div>
+          <p class="text-xs text-slate-600 text-center">Haz clic en el mapa para marcar la ubicación y obtener la dirección automáticamente</p>
+          <p *ngIf="selectedLocation" class="text-xs text-green-600 mt-1 text-center">
+            📍 Coordenadas: {{selectedLocation.lat | number:'1.6-6'}}, {{selectedLocation.lng | number:'1.6-6'}}
+          </p>
+        </div>
+        
         <!-- Comentarios -->
         <div>
-          <label class="block text-sm font-medium text-slate-900 mb-1" for="comentarios">Comentarios *</label>
+          <label class="block text-sm font-medium text-slate-900 mb-1" for="comentarios">Comentarios <span class="text-red-500">*</span></label>
           <textarea 
             formControlName="comentarios"
             class="w-full p-3 sm:p-4 text-sm sm:text-base rounded-md border border-slate-300 focus:ring-2 focus:ring-blue-600 focus:border-blue-600 transition resize-none"

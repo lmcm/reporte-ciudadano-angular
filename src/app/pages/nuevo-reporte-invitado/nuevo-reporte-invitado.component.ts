@@ -1,4 +1,4 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, inject, AfterViewInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
@@ -7,6 +7,8 @@ import { ReportesService } from '../../services/reportes.service';
 import { TwilioWhatsappService } from '../../services/twilio-whatsapp.service';
 import { TipoServicio, EstadoReporte, PrioridadReporte } from '../../models/reporte.model';
 
+declare var L: any;
+
 @Component({
   selector: 'app-nuevo-reporte-invitado',
   standalone: true,
@@ -14,7 +16,7 @@ import { TipoServicio, EstadoReporte, PrioridadReporte } from '../../models/repo
   templateUrl: './nuevo-reporte-invitado.component.html',
   styleUrls: ['./nuevo-reporte-invitado.component.css']
 })
-export class NuevoReporteInvitadoComponent implements OnInit {
+export class NuevoReporteInvitadoComponent implements OnInit, AfterViewInit {
   private fb = inject(FormBuilder);
   private router = inject(Router);
   private reportesService = inject(ReportesService);
@@ -25,6 +27,9 @@ export class NuevoReporteInvitadoComponent implements OnInit {
   isLoading = false;
   successMessage = '';
   errorMessage = '';
+  private map: any;
+  private marker: any;
+  selectedLocation: {lat: number, lng: number} | null = null;
 
   tiposServicio = [
     { value: TipoServicio.LAMPARA, label: 'Reparación de luminaria' },
@@ -36,6 +41,10 @@ export class NuevoReporteInvitadoComponent implements OnInit {
 
   ngOnInit() {
     this.initializeForm();
+  }
+
+  ngAfterViewInit() {
+    this.loadLeaflet();
   }
 
   private initializeForm() {
@@ -121,7 +130,11 @@ export class NuevoReporteInvitadoComponent implements OnInit {
         ciudadanoNombre: 'Usuario',
         ciudadanoApellidos: 'Anónimo',
         ciudadanoEmail: 'anonimo@invitado.com',
-        ciudadanoTelefono: formData.telefono
+        ciudadanoTelefono: formData.telefono,
+        coordenadas: this.selectedLocation ? {
+          lat: this.selectedLocation.lat,
+          lng: this.selectedLocation.lng
+        } : undefined
       };
 
       this.reportesService.crearReporte(reporteData).subscribe({
@@ -147,6 +160,11 @@ export class NuevoReporteInvitadoComponent implements OnInit {
           }
           
           this.reporteForm.reset();
+          this.selectedLocation = null;
+          if (this.marker) {
+            this.map.removeLayer(this.marker);
+            this.marker = null;
+          }
           this.isLoading = false;
         },
         error: (error) => {
@@ -157,5 +175,119 @@ export class NuevoReporteInvitadoComponent implements OnInit {
     } else {
       this.reporteForm.markAllAsTouched();
     }
+  }
+
+  private loadLeaflet(): void {
+    if (typeof L !== 'undefined') {
+      this.initMap();
+      return;
+    }
+
+    // Cargar CSS de Leaflet
+    const link = document.createElement('link');
+    link.rel = 'stylesheet';
+    link.href = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.css';
+    document.head.appendChild(link);
+
+    // Cargar JavaScript de Leaflet
+    const script = document.createElement('script');
+    script.src = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js';
+    script.onload = () => {
+      this.initMap();
+    };
+    document.head.appendChild(script);
+  }
+
+  private initMap(): void {
+    // Coordenadas de Boca del Río, Veracruz
+    const bocaDelRio = [19.1127, -96.1147];
+    
+    this.map = L.map('guestMap').setView(bocaDelRio, 13);
+    
+    // Agregar capa de OpenStreetMap
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '© OpenStreetMap contributors'
+    }).addTo(this.map);
+    
+    // Agregar listener para clics en el mapa
+    this.map.on('click', (event: any) => {
+      this.onMapClick(event);
+    });
+  }
+
+  private onMapClick(event: any): void {
+    // Remover marcador anterior si existe
+    if (this.marker) {
+      this.map.removeLayer(this.marker);
+    }
+    
+    // Crear nuevo marcador
+    this.marker = L.marker([event.latlng.lat, event.latlng.lng])
+      .addTo(this.map)
+      .bindPopup('Obteniendo dirección...')
+      .openPopup();
+    
+    // Guardar coordenadas
+    this.selectedLocation = {
+      lat: event.latlng.lat,
+      lng: event.latlng.lng
+    };
+    
+    // Obtener dirección usando geocodificación inversa
+    this.getAddressFromCoordinates(event.latlng.lat, event.latlng.lng);
+  }
+
+  private getAddressFromCoordinates(lat: number, lng: number): void {
+    const url = `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&zoom=18&addressdetails=1`;
+    
+    fetch(url)
+      .then(response => response.json())
+      .then(data => {
+        if (data && data.display_name) {
+          const address = this.formatAddress(data);
+          
+          // Actualizar campo de dirección
+          this.reporteForm.patchValue({ direccion: address });
+          
+          // Actualizar popup del marcador
+          if (this.marker) {
+            this.marker.bindPopup(`Ubicación: ${address}`).openPopup();
+          }
+        }
+      })
+      .catch(error => {
+        console.error('Error al obtener dirección', error);
+        if (this.marker) {
+          this.marker.bindPopup('Ubicación seleccionada').openPopup();
+        }
+      });
+  }
+
+  private formatAddress(data: any): string {
+    const address = data.address || {};
+    const parts = [];
+    
+    // Agregar número y calle
+    if (address.house_number) parts.push(address.house_number);
+    if (address.road) parts.push(address.road);
+    
+    // Agregar colonia/barrio
+    if (address.neighbourhood) parts.push(`Col. ${address.neighbourhood}`);
+    else if (address.suburb) parts.push(`Col. ${address.suburb}`);
+    
+    // Agregar ciudad
+    if (address.city) parts.push(address.city);
+    else if (address.town) parts.push(address.town);
+    else if (address.village) parts.push(address.village);
+    
+    // Agregar estado
+    if (address.state) parts.push(address.state);
+    
+    // Si no hay suficiente información, usar display_name
+    if (parts.length < 2) {
+      return data.display_name.split(',').slice(0, 3).join(', ');
+    }
+    
+    return parts.join(', ');
   }
 }

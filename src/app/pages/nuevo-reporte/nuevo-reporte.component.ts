@@ -1,4 +1,4 @@
-import { Component, OnDestroy, inject, OnInit } from '@angular/core';
+import { Component, OnDestroy, inject, OnInit, AfterViewInit } from '@angular/core';
 import { RouterLink, Router } from '@angular/router';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { CommonModule } from '@angular/common';
@@ -12,6 +12,8 @@ import { ReporteValidators } from '../../validators/reporte.validators';
 import { TipoServicio, PrioridadReporte, EstadoReporte, ReporteCreate } from '../../models/reporte.model';
 import { HeaderComponent } from "src/app/components/header/header.component";
 
+declare var L: any;
+
 @Component({
   selector: 'app-nuevo-reporte',
   standalone: true,
@@ -19,7 +21,7 @@ import { HeaderComponent } from "src/app/components/header/header.component";
   templateUrl: './nuevo-reporte.component.html',
   styles: []
 })
-export class NuevoReporteComponent implements OnInit, OnDestroy {
+export class NuevoReporteComponent implements OnInit, OnDestroy, AfterViewInit {
   private fb = inject(FormBuilder);
   private reportesService = inject(ReportesService);
   private authService = inject(AuthService);
@@ -39,6 +41,9 @@ export class NuevoReporteComponent implements OnInit, OnDestroy {
   redirectCountdown = 0;
   currentReporteId = '';
   private countdownInterval: any = null;
+  private map: any;
+  private marker: any;
+  selectedLocation: {lat: number, lng: number} | null = null;
 
   readonly tiposServicio = [
     { value: TipoServicio.LAMPARA, label: 'Lámpara fundida o averiada' },
@@ -55,12 +60,135 @@ export class NuevoReporteComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.loadUserData();
+    this.loadLeaflet();
+  }
+
+  ngAfterViewInit(): void {
+    // El mapa se inicializará cuando Google Maps se cargue
   }
 
   ngOnDestroy(): void {
     this.destroy$.next();
     this.destroy$.complete();
     this.logger.info('NuevoReporteComponent destruido');
+  }
+
+  private loadLeaflet(): void {
+    if (typeof L !== 'undefined') {
+      this.initMap();
+      return;
+    }
+
+    // Cargar CSS de Leaflet
+    const link = document.createElement('link');
+    link.rel = 'stylesheet';
+    link.href = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.css';
+    document.head.appendChild(link);
+
+    // Cargar JavaScript de Leaflet
+    const script = document.createElement('script');
+    script.src = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js';
+    script.onload = () => {
+      this.initMap();
+    };
+    document.head.appendChild(script);
+  }
+
+  private initMap(): void {
+    // Coordenadas de Boca del Río, Veracruz
+    const bocaDelRio = [19.1127, -96.1147];
+    
+    this.map = L.map('map').setView(bocaDelRio, 13);
+    
+    // Agregar capa de OpenStreetMap
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '© OpenStreetMap contributors'
+    }).addTo(this.map);
+    
+    // Agregar listener para clics en el mapa
+    this.map.on('click', (event: any) => {
+      this.onMapClick(event);
+    });
+  }
+
+  private onMapClick(event: any): void {
+    // Remover marcador anterior si existe
+    if (this.marker) {
+      this.map.removeLayer(this.marker);
+    }
+    
+    // Crear nuevo marcador
+    this.marker = L.marker([event.latlng.lat, event.latlng.lng])
+      .addTo(this.map)
+      .bindPopup('Obteniendo dirección...')
+      .openPopup();
+    
+    // Guardar coordenadas
+    this.selectedLocation = {
+      lat: event.latlng.lat,
+      lng: event.latlng.lng
+    };
+    
+    // Obtener dirección usando geocodificación inversa
+    this.getAddressFromCoordinates(event.latlng.lat, event.latlng.lng);
+    
+    this.logger.info('Ubicación seleccionada en mapa', this.selectedLocation);
+  }
+
+  private getAddressFromCoordinates(lat: number, lng: number): void {
+    const url = `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&zoom=18&addressdetails=1`;
+    
+    fetch(url)
+      .then(response => response.json())
+      .then(data => {
+        if (data && data.display_name) {
+          const address = this.formatAddress(data);
+          
+          // Actualizar campo de dirección
+          this.reporteForm.patchValue({ direccion: address });
+          
+          // Actualizar popup del marcador
+          if (this.marker) {
+            this.marker.bindPopup(`Ubicación: ${address}`).openPopup();
+          }
+          
+          this.logger.info('Dirección obtenida', { address, data });
+        }
+      })
+      .catch(error => {
+        this.logger.error('Error al obtener dirección', error);
+        if (this.marker) {
+          this.marker.bindPopup('Ubicación seleccionada').openPopup();
+        }
+      });
+  }
+
+  private formatAddress(data: any): string {
+    const address = data.address || {};
+    const parts = [];
+    
+    // Agregar número y calle
+    if (address.house_number) parts.push(address.house_number);
+    if (address.road) parts.push(address.road);
+    
+    // Agregar colonia/barrio
+    if (address.neighbourhood) parts.push(`Col. ${address.neighbourhood}`);
+    else if (address.suburb) parts.push(`Col. ${address.suburb}`);
+    
+    // Agregar ciudad
+    if (address.city) parts.push(address.city);
+    else if (address.town) parts.push(address.town);
+    else if (address.village) parts.push(address.village);
+    
+    // Agregar estado
+    if (address.state) parts.push(address.state);
+    
+    // Si no hay suficiente información, usar display_name
+    if (parts.length < 2) {
+      return data.display_name.split(',').slice(0, 3).join(', ');
+    }
+    
+    return parts.join(', ');
   }
 
   private createForm(): FormGroup {
@@ -136,7 +264,11 @@ export class NuevoReporteComponent implements OnInit, OnDestroy {
       ciudadanoTelefono: formData.ciudadanoTelefono?.trim() || '',
       estado: EstadoReporte.PENDIENTE, // Estado inicial para historial
       prioridad: this.calculatePriority(formData.tipoServicio),
-      evidenciasFotograficas: this.selectedFile ? [] : undefined
+      evidenciasFotograficas: this.selectedFile ? [] : undefined,
+      coordenadas: this.selectedLocation ? {
+        lat: this.selectedLocation.lat,
+        lng: this.selectedLocation.lng
+      } : undefined
     };
   }
 
@@ -231,6 +363,11 @@ export class NuevoReporteComponent implements OnInit, OnDestroy {
   private resetForm(): void {
     this.reporteForm.reset();
     this.selectedFile = null;
+    this.selectedLocation = null;
+    if (this.marker) {
+      this.map.removeLayer(this.marker);
+      this.marker = null;
+    }
   }
 
   private clearMessages(): void {

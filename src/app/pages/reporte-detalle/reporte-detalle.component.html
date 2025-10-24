@@ -172,6 +172,35 @@
             <textarea class="form-textarea w-full rounded-md border-slate-300 bg-gray-50 text-slate-900" disabled rows="4">{{ reporte.comentarios }}</textarea>
           </div>
           
+          <!-- Ubicación en el Mapa -->
+          <div *ngIf="reporte.coordenadas" class="md:col-span-2">
+            <label class="block text-sm font-medium text-slate-900 pb-1.5">Ubicación del Problema</label>
+            <div id="detailMap" class="w-full h-64 rounded-md border border-slate-300 mb-2"></div>
+            <p class="text-xs text-slate-600 text-center">
+              📍 Coordenadas: {{reporte.coordenadas.lat | number:'1.6-6'}}, {{reporte.coordenadas.lng | number:'1.6-6'}}
+            </p>
+          </div>
+          
+          <!-- Evidencias Fotográficas -->
+          <div *ngIf="reporte.evidenciasFotograficas && reporte.evidenciasFotograficas.length > 0" class="md:col-span-2">
+            <label class="block text-sm font-medium text-slate-900 pb-1.5">Evidencias Fotográficas</label>
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              <div *ngFor="let imagen of reporte.evidenciasFotograficas" class="relative group">
+                <img 
+                  [src]="imagen" 
+                  [alt]="'Evidencia del reporte ' + reporte.folio"
+                  class="w-full h-48 object-cover rounded-lg border border-slate-300 cursor-pointer hover:opacity-90 transition-opacity"
+                  (click)="abrirImagenModal(imagen)"
+                  (error)="onImageError($event)" />
+                <div class="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-10 transition-all duration-200 rounded-lg flex items-center justify-center">
+                  <svg class="w-8 h-8 text-white opacity-0 group-hover:opacity-100 transition-opacity" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7"></path>
+                  </svg>
+                </div>
+              </div>
+            </div>
+          </div>
+          
           <div>
             <label class="block text-sm font-medium text-slate-900 pb-1.5">Ciudadano</label>
             <input class="form-input w-full rounded-md border-slate-300 bg-gray-50 text-slate-900" disabled [value]="reporte.ciudadanoNombre + ' ' + reporte.ciudadanoApellidos" />
@@ -229,6 +258,20 @@
           </div>
         </div>
         
+      </div>
+      
+      <!-- Modal para ver imagen completa -->
+      <div *ngIf="imagenModalAbierta" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-75" (click)="cerrarImagenModal()">
+        <div class="relative max-w-4xl max-h-full p-4">
+          <img [src]="imagenModalSrc" class="max-w-full max-h-full object-contain rounded-lg" />
+          <button 
+            (click)="cerrarImagenModal()"
+            class="absolute top-2 right-2 text-white bg-black bg-opacity-50 rounded-full p-2 hover:bg-opacity-75 transition-all">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+            </svg>
+          </button>
+        </div>
       </div>
       
       <!-- Historial de Actualizaciones -->

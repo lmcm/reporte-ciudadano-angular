@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, inject } from '@angular/core';
+import { Component, OnInit, OnDestroy, inject, AfterViewInit } from '@angular/core';
 import { ActivatedRoute, RouterLink, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
@@ -9,6 +9,8 @@ import { AuthService } from '../../services/auth.service';
 import { Reporte, EstadoReporte, TipoServicio, HistorialEstado } from '../../models/reporte.model';
 import { Comentario, ComentarioCreate, TipoAutor } from '../../models/comentario.model';
 
+declare var L: any;
+
 @Component({
   selector: 'app-reporte-detalle',
   standalone: true,
@@ -16,7 +18,7 @@ import { Comentario, ComentarioCreate, TipoAutor } from '../../models/comentario
   templateUrl: './reporte-detalle.component.html',
   styles: []
 })
-export class ReporteDetalleComponent implements OnInit, OnDestroy {
+export class ReporteDetalleComponent implements OnInit, OnDestroy, AfterViewInit {
   private destroy$ = new Subject<void>();
   private reportesService = inject(ReportesService);
   private comentariosService = inject(ComentariosService);
@@ -36,6 +38,9 @@ export class ReporteDetalleComponent implements OnInit, OnDestroy {
   areaAsignada = '';
   actualizandoEstado = false;
   actualizandoArea = false;
+  private map: any;
+  imagenModalAbierta = false;
+  imagenModalSrc = '';
 
   ngOnInit() {
     this.reporteId = this.route.snapshot.paramMap.get('id') || '';
@@ -51,6 +56,10 @@ export class ReporteDetalleComponent implements OnInit, OnDestroy {
   ngOnDestroy() {
     this.destroy$.next();
     this.destroy$.complete();
+  }
+
+  ngAfterViewInit() {
+    // El mapa se inicializará cuando se cargue el reporte
   }
 
   private cargarReporte() {
@@ -70,6 +79,10 @@ export class ReporteDetalleComponent implements OnInit, OnDestroy {
             this.reporte = reporte;
             this.areaAsignada = reporte.personalAsignado || '';
             this.loading = false;
+            // Inicializar mapa si hay coordenadas
+            if (reporte.coordenadas) {
+              setTimeout(() => this.initMap(), 100);
+            }
           } else if (intento < 3) {
             // Reintentar hasta 3 veces con delay creciente
             setTimeout(() => {
@@ -285,5 +298,61 @@ export class ReporteDetalleComponent implements OnInit, OnDestroy {
           this.actualizandoArea = false;
         }
       });
+  }
+
+  private initMap(): void {
+    if (!this.reporte?.coordenadas || typeof L === 'undefined') {
+      this.loadLeafletAndInitMap();
+      return;
+    }
+    
+    const coords = [this.reporte.coordenadas.lat, this.reporte.coordenadas.lng];
+    
+    this.map = L.map('detailMap').setView(coords, 16);
+    
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '© OpenStreetMap contributors'
+    }).addTo(this.map);
+    
+    // Agregar marcador en la ubicación del problema
+    L.marker(coords)
+      .addTo(this.map)
+      .bindPopup('Ubicación del problema reportado')
+      .openPopup();
+  }
+
+  private loadLeafletAndInitMap(): void {
+    if (typeof L !== 'undefined') {
+      this.initMap();
+      return;
+    }
+
+    // Cargar CSS de Leaflet
+    const link = document.createElement('link');
+    link.rel = 'stylesheet';
+    link.href = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.css';
+    document.head.appendChild(link);
+
+    // Cargar JavaScript de Leaflet
+    const script = document.createElement('script');
+    script.src = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js';
+    script.onload = () => {
+      this.initMap();
+    };
+    document.head.appendChild(script);
+  }
+
+  abrirImagenModal(imagenSrc: string): void {
+    this.imagenModalSrc = imagenSrc;
+    this.imagenModalAbierta = true;
+  }
+
+  cerrarImagenModal(): void {
+    this.imagenModalAbierta = false;
+    this.imagenModalSrc = '';
+  }
+
+  onImageError(event: any): void {
+    event.target.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZGRkIi8+PHRleHQgeD0iNTAlIiB5PSI1MCUiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxNCIgZmlsbD0iIzk5OSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZHk9Ii4zZW0iPkltYWdlbiBubyBkaXNwb25pYmxlPC90ZXh0Pjwvc3ZnPic=';
   }
 }

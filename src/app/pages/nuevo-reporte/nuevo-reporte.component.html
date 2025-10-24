@@ -121,6 +121,7 @@
       <div class="mb-6 sm:mb-8 text-center">
         <h2 class="text-2xl sm:text-3xl font-bold text-slate-900">Crear un Reporte de Servicio</h2>
         <p class="text-slate-600 mt-2 text-sm sm:text-base">Ayúdanos a mejorar Boca del Río reportando problemas.</p>
+        <p class="text-slate-500 mt-2 text-xs sm:text-sm">Los campos marcados con <span class="text-red-500">*</span> son obligatorios</p>
       </div>
       
       <!-- Mensajes de estado -->
@@ -216,7 +217,7 @@
         </div>
         
         <div>
-          <label class="block text-sm font-medium text-slate-900 mb-1" for="address">Dirección / Ubicación <span class="text-red-500">*</span></label>
+          <label class="block text-sm font-medium text-slate-900 mb-1" for="address">Dirección / Ubicación del problema o avería<span class="text-red-500">*</span></label>
           <input 
             formControlName="direccion"
             class="w-full h-12 px-4 rounded-md border border-slate-300 focus:ring-2 focus:ring-blue-600 focus:border-blue-600 transition"
@@ -229,8 +230,23 @@
         
         <div>
           <p class="text-sm font-medium text-slate-900 mb-1">Ubicación en el Mapa (Opcional)</p>
-          <div class="w-full h-64 bg-center bg-no-repeat bg-cover rounded-md border border-slate-300" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuDYh-oHWfX_chqFvJz7mFIfAfIb2Jxn0oTyHj_43IGTASV4hEmHCwqb1nuADAToOXP0n2VTCRextZELcgBdKmEg3zRQvRqA2nzSblMjTUpvN5p_imb4x6-1VwTsBNMRb2eknxGZo-1le_119GxTNiEKjHvCyGmjjyFkNN7s1-hTkrGlz6513YlYsVkCJTIY15mLbV8cPb3J8JtakXyG-yi2T5YEyZjryCcLctuZj8pMontAIJtjJ8_BCPd20dit4LxwB1KJh7AZKK42");'></div>
-          <p class="text-xs text-slate-600 mt-1 text-center">Arrastra el marcador a la ubicación exacta del problema en Boca del Río.</p>
+          <div id="map" class="w-full h-64 rounded-md border border-slate-300"></div>
+          <p class="text-xs text-slate-600 mt-1 text-center">Haz clic en el mapa para marcar la ubicación y obtener la dirección automáticamente</p>
+          <p *ngIf="selectedLocation" class="text-xs text-green-600 mt-1 text-center">
+            📍 Coordenadas: {{selectedLocation.lat | number:'1.6-6'}}, {{selectedLocation.lng | number:'1.6-6'}}
+          </p>
+        </div>
+        
+        <div>
+          <label class="block text-sm font-medium text-slate-900 mb-1" for="comments">Comentarios <span class="text-red-500">*</span></label>
+          <textarea 
+            formControlName="comentarios"
+            class="w-full p-4 rounded-md border border-slate-300 focus:ring-2 focus:ring-blue-600 focus:border-blue-600 transition"
+            [class.border-red-500]="hasError('comentarios')"
+            id="comments" 
+            placeholder="Agregue detalles adicionales que puedan ser útiles."
+            rows="4"></textarea>
+          <p *ngIf="hasError('comentarios')" class="text-red-500 text-xs mt-1">{{ getErrorMessage('comentarios') }}</p>
         </div>
         
         <div>
@@ -258,18 +274,6 @@
           <p *ngIf="selectedFile" class="text-green-600 text-xs mt-1">
             ✓ Archivo seleccionado: {{ selectedFile.name }}
           </p>
-        </div>
-        
-        <div>
-          <label class="block text-sm font-medium text-slate-900 mb-1" for="comments">Comentarios <span class="text-red-500">*</span></label>
-          <textarea 
-            formControlName="comentarios"
-            class="w-full p-4 rounded-md border border-slate-300 focus:ring-2 focus:ring-blue-600 focus:border-blue-600 transition"
-            [class.border-red-500]="hasError('comentarios')"
-            id="comments" 
-            placeholder="Agregue detalles adicionales que puedan ser útiles."
-            rows="4"></textarea>
-          <p *ngIf="hasError('comentarios')" class="text-red-500 text-xs mt-1">{{ getErrorMessage('comentarios') }}</p>
         </div>
         
         <div class="pt-4">
